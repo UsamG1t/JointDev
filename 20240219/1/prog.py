@@ -41,4 +41,16 @@ elif len(sys.argv) == 3:
 
     tree_parsing(commit_data[0].decode().split(' ')[1])
 
-   
+    print("\n-----\n")
+
+    while commit_data:
+        print(f'TREE for commit {last_commit}')
+        tree_parsing(commit_data[0].decode().split(' ')[1])
+
+        if not commit_data[3]:
+            break
+
+        last_commit = commit_data[1].decode().split(' ')[1]
+        with open(sys.argv[1] + '/.git/objects/' + 
+                  last_commit[0:2] + '/' + last_commit[2:], 'rb') as commit:
+            commit_data = zlib.decompress(commit.read()).partition(b'\00')[2].split(b'\n')
