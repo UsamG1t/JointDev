@@ -32,7 +32,5 @@ elif len(sys.argv) == 3:
     with open(sys.argv[1] + '/.git/objects/' + 
               last_commit[0:2] + '/' + last_commit[2:], 'rb') as commit:
         commit_data = zlib.decompress(commit.read()).partition(b'\00')[2].split(b'\n')
-    print(commit_data[0].decode())
-    print(commit_data[1].decode())
-    print(*commit_data[2].decode().split(' ')[:-2])
-    print(*commit_data[3].decode().split(' ')[:-2])
+
+    tree_parsing(commit_data[0].decode().split(' ')[1])
