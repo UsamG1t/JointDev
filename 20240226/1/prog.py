@@ -29,16 +29,16 @@ while inp := input().split():
                     or not args[0].isdigit() \
                     or not args[1].isdigit() \
                     or not isinstance(args[2], str):
-                print('Invalid arguments3')
-                break
+                print('Invalid arguments')
             
-            args[0] = int(args[0])
-            args[1] = int(args[1])
-            print(f'Added monster to ({args[0]}, {args[1]}) saying {args[2]}')
-            if monsters.setdefault(args[1] * 10 + args[0], None) != None:
-                print("Replaced the old monster")
+            else:
+                args[0] = int(args[0])
+                args[1] = int(args[1])
+                print(f'Added monster to ({args[0]}, {args[1]}) saying {args[2]}')
+                if monsters.setdefault(args[1] * 10 + args[0], None) != None:
+                    print("Replaced the old monster")
 
-            monsters[args[1]*10 + args[0]] = args[2]
+                monsters[args[1]*10 + args[0]] = args[2]
 
         case _:
             print("Invalid command")
