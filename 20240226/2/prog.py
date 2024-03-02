@@ -35,7 +35,7 @@ while inp := input().split():
             
             args[1] = int(args[1])
             args[2] = int(args[2])
-            print(f'Added monster to ({args[1]}, {args[2]}) saying {args[3]}')
+            print(f'Added monster {args[0]} to ({args[1]}, {args[2]}) saying {args[3]}')
             if monsters.setdefault(args[2] * 10 + args[1], None) != None:
                 print("Replaced the old monster")
 
