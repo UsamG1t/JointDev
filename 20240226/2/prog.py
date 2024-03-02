@@ -39,7 +39,7 @@ while inp := input().split():
             if monsters.setdefault(args[2] * 10 + args[1], None) != None:
                 print("Replaced the old monster")
 
-            monsters[args[2]*10 + args[1]] = args[3]
+            monsters[args[2]*10 + args[1]] = [args[0], args[3]]
 
         case _:
             print("Invalid command")
