@@ -32,7 +32,8 @@ while inp := input().split():
                     or not args[2].isdigit() \
                     or not isinstance(args[3], str):
                 print('Invalid arguments')
-                
+            elif args[0] not in cowsay.list_cows():
+                print('Cannot add unknown monster')
             else:
                 args[1] = int(args[1])
                 args[2] = int(args[2])
