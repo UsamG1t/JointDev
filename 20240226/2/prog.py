@@ -5,7 +5,8 @@ class Player:
         self.x = self.y = 0
 
 def encounter(x, y):
-    print(cowsay.cowsay(monsters[y*10 + x]))
+    name, message = monsters[y*10 + x]
+    print(cowsay.cowsay(message, cow=name))
 
 
 field = [[' ' for i in range(10)] for j in range(10)]
