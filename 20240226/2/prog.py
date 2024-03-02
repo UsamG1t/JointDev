@@ -5,7 +5,8 @@ class Player:
         self.x = self.y = 0
 
 def encounter(x, y):
-    print(cowsay.cowsay(monsters[y*10 + x]))
+    name, message = monsters[y*10 + x]
+    print(cowsay.cowsay(message, cow=name))
 
 
 field = [[' ' for i in range(10)] for j in range(10)]
@@ -31,15 +32,15 @@ while inp := input().split():
                     or not args[2].isdigit() \
                     or not isinstance(args[3], str):
                 print('Invalid arguments')
-                break
-            
-            args[1] = int(args[1])
-            args[2] = int(args[2])
-            print(f'Added monster {args[0]} to ({args[1]}, {args[2]}) saying {args[3]}')
-            if monsters.setdefault(args[2] * 10 + args[1], None) != None:
-                print("Replaced the old monster")
+                
+            else:
+                args[1] = int(args[1])
+                args[2] = int(args[2])
+                print(f'Added monster {args[0]} to ({args[1]}, {args[2]}) saying {args[3]}')
+                if monsters.setdefault(args[2] * 10 + args[1], None) != None:
+                    print("Replaced the old monster")
 
-            monsters[args[2]*10 + args[1]] = [args[0], args[3]]
+                monsters[args[2]*10 + args[1]] = [args[0], args[3]]
 
         case _:
             print("Invalid command")
