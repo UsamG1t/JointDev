@@ -1,4 +1,21 @@
 import cowsay
+import io
+
+custom_monster = cowsay.read_dot_cow(io.StringIO("""
+$the_cow = <<EOC;
+         $thoughts
+          $thoughts
+    ,_                    _,
+    ) '-._  ,_    _,  _.-' (
+    )  _.-'.|\\--//|.'-._  (
+     )'   .'\/o\/o\/'.   `(
+      ) .' . \====/ . '. (
+       )  / <<    >> \  (
+        '-._/``  ``\_.-'
+  jgs     __\\'--'//__
+         (((""`  `"")))
+EOC
+"""))
 
 class Player:
     def __init__(self):
@@ -17,7 +34,10 @@ class Game:
 
     def encounter(self, x, y):
         monster = self.monsters[self.key(x, y)]
-        print(cowsay.cowsay(monster["message"], cow=monster["name"]))
+        if monster['name'] == 'jgsbat':
+            print(cowsay.cowsay(monster["message"], cowfile=custom_monster))
+        else:
+            print(cowsay.cowsay(monster["message"], cow=monster["name"]))
 
     def Play(self):
 
@@ -43,7 +63,8 @@ class Game:
                             or not args[2].isdigit() \
                             or not isinstance(args[3], str):
                         print('Invalid arguments')
-                    elif args[0] not in cowsay.list_cows():
+                    elif args[0] not in cowsay.list_cows() \
+                            and args[0] != 'jgsbat':
                         print('Cannot add unknown monster')
                     else:
                         args[1] = int(args[1])
