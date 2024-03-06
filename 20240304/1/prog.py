@@ -1,4 +1,5 @@
 import cowsay
+import shlex
 
 class Player:
     def __init__(self):
@@ -21,7 +22,7 @@ class Game:
 
     def Play(self):
 
-        while inp := input().split():
+        while inp := shlex.split(input()):
             match inp:
                 case ['up' | 'down' | 'left' | 'right']:
                     self.player.y = (self.player.y + self.field_size \
