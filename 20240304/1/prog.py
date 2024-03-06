@@ -21,6 +21,8 @@ class Game:
 
     def Play(self):
 
+        print("<<< Welcome to Python-MUD 0.1 >>>")
+        
         while inp := input().split():
             match inp:
                 case ['up' | 'down' | 'left' | 'right']:
