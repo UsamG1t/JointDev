@@ -7,29 +7,34 @@ class Player:
 class Game:
 
     def __init__(self):
-        # self.field = [[' ' for i in range(10)] for j in range(10)]
+        # self.field = [[' ' for i in range(self.field_size)] for j in range(self.field_size)]
+        self.field_size = 10
         self.monsters = {}
         self.player  = Player()
 
+    def key(self, a, b):
+        return b * self.field_size + a
+
     def encounter(self, x, y):
-        name, message = self.monsters[y*10 + x]
-        print(cowsay.cowsay(message, cow=name))
+        monster = self.monsters[self.key(x, y)]
+        print(cowsay.cowsay(monster["message"], cow=monster["name"]))
 
     def Play(self):
-
-        print("<<< Welcome to Python-MUD 0.1 >>>")
 
         while inp := input().split():
             match inp:
                 case ['up' | 'down' | 'left' | 'right']:
-                    self.player .y = (self.player .y + 10 - (inp[0] == 'up')) % 10
-                    self.player .y = (self.player .y + 10 + (inp[0] == 'down')) % 10
-                    self.player .x = (self.player .x + 10 - (inp[0] == 'left')) % 10
-                    self.player .x = (self.player .x + 10 + (inp[0] == 'right')) % 10
+                    self.player.y = (self.player.y + self.field_size \
+                                     - (inp[0] == 'up') + (inp[0] == 'down')) \
+                                     % self.field_size
+                    self.player.x = (self.player.x + self.field_size \
+                                     - (inp[0] == 'left') + (inp[0] == 'right')) \
+                                     % self.field_size
+                    
                     print(f'Moved to ({self.player .x}, {self.player .y})')
 
-                    if self.monsters.setdefault(self.player .y*10 + self.player .x, None) != None:
-                        self.encounter(self.player .x, self.player .y)
+                    if self.monsters.setdefault(self.key(self.player.x, self.player.y), None) != None:
+                        self.encounter(self.player.x, self.player.y)
 
                 case ['addmon', *args]:
                     if  len(args) != 4 \
@@ -44,10 +49,10 @@ class Game:
                         args[1] = int(args[1])
                         args[2] = int(args[2])
                         print(f'Added monster {args[0]} to ({args[1]}, {args[2]}) saying {args[3]}')
-                        if self.monsters.setdefault(args[2] * 10 + args[1], None) != None:
+                        if self.monsters.setdefault(self.key(args[1], args[2]), None) != None:
                             print("Replaced the old monster")
 
-                        self.monsters[args[2]*10 + args[1]] = [args[0], args[3]]
+                        self.monsters[self.key(args[1], args[2])] = {"name": args[0], "message": args[3]}
 
                 case _:
                     print("Invalid command")
