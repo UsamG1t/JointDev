@@ -31,13 +31,17 @@ class Player:
         self.x = self.y = 0
         self.field_size = 10
     
+    def position(self):
+        return (self.x, self.y)
+
     def move(self, method, args):        
         self.x = (self.x + self.field_size
                  + self.steps[method]['x']) % self.field_size
         self.y = (self.y + self.field_size
                  + self.steps[method]['y']) % self.field_size
 
-        return (self.x, self.y)
+        return self.position()
+
 
 class Monster:
     def __init__(self, name, hp, message):
@@ -51,6 +55,11 @@ class Monster:
         else:
             print(cowsay.cowsay(self.message, cow=self.name))
 
+    def damage(self):
+        dmg = min([self.hp, 10])
+        self.hp = self.hp - dmg
+
+        return (self.name, dmg, self.hp)
 
 class Game:
 
@@ -59,15 +68,15 @@ class Game:
         self.monsters = {} # key(x, y) -> Monster()
         self.player  = Player()
         
-    def key(self, a, b):
-        return b * self.field_size + a
+    def key(self, position):
+        return position[1] * self.field_size + position[0]
     
     def move(self, method, args):
         position = self.player.move(method, args)
 
         print(f'Moved to ({position[0]}, {position[1]})')
 
-        key = self.key(position[0], position[1])
+        key = self.key(position)
         if self.monsters.setdefault(key, None) != None:
             self.monsters[key].encounter()
 
@@ -137,12 +146,30 @@ class Game:
         if not broken:
             print(f'Added monster {monster["name"]} to ({m_x}, {m_y}) saying {monster["message"]}')
             
-            key = self.key(m_x, m_y)
+            key = self.key((m_x, m_y))
             if self.monsters.setdefault(key, None) != None:
                 del self.monsters[key]
                 print("Replaced the old monster")
 
             self.monsters[key] = Monster(monster['name'], monster['hp'], monster['message'])
+
+    def attack(self):
+        position = self.player.position()
+        key = self.key(position)
+
+        if self.monsters.setdefault(key, None) != None:
+            name, dmg, hp = self.monsters[key].damage()
+            print(f'Attacked {name},  damage {dmg} hp')
+            
+            if hp:
+                print(f'{name} now has {hp}')
+            else:
+                print(f'{name} died')
+                del self.monsters[key]
+        else:
+            print('No monster here')
+
+
 
 class MUDcmd(cmd.Cmd):
 
@@ -186,5 +213,10 @@ class MUDcmd(cmd.Cmd):
         3. hello <string (with quotation for more than one word)>
         '''
         self.game.addmon(args)
+
+    def do_attack(self, args):
+        'Attack the monster in current position'
+
+        self.game.attack()
 
 MUDcmd().cmdloop()
