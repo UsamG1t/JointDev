@@ -223,4 +223,13 @@ class MUDcmd(cmd.Cmd):
 
         self.game.attack(args)
 
-MUDcmd().cmdloop()
+    def complete_attack(self, text, line, begidx, endidx):
+        words = (line[:endidx] + ".").split()
+        DICT = []
+        match len(words):
+            case 2:
+                DICT = cowsay.list_cows() + ['jgsbat']
+        return [c for c in DICT if c.startswith(text)]
+
+if __name__ == '__main__':
+    MUDcmd().cmdloop()
