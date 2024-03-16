@@ -163,22 +163,22 @@ class Game:
     def attack(self, args):
         position = self.player.position()
         key = self.key(position)
-
+	weapon = None
         args = shlex.split(args)
-        weapon = None
         
-        if self.monsters.setdefault(key, None) == None:
-            print('No monster here')
+	if self.monsters.setdefault(key, None) == None \
+        or self.monsters[key].name != args[0]:
+            print(f'No {args[0]} here')
             return
 
         match args:
-            case ['with', weapon_type]:
+            case [name, 'with', weapon_type]:
                 if weapon_type not in self.player.weapons.keys():
                     print('Unknown weapon')
                 else:
                     weapon = {'type'  : weapon_type,
                               'damage': self.player.weapons[weapon_type]}
-            case []:
+            case [name]:
                 weapon = {'type'  : 'sword',
                           'damage': self.player.weapons['sword']}
             case _:
@@ -250,9 +250,12 @@ class MUDcmd(cmd.Cmd):
         words = (line[:endidx] + ".").split()
         DICT = []
         match len(words):
-            case 3:
-                if words[1].startswith('with'):
+            case 2:
+                DICT = cowsay.list_cows() + ['jgsbat']
+            case 4:
+                if words[2].startswith('with'):
                     DICT = self.game.player.weapons.keys()
         return [c for c in DICT if c.startswith(text)]
 
-MUDcmd().cmdloop()
+if __name__ == '__main__':
+    MUDcmd().cmdloop()
