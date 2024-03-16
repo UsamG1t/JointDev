@@ -153,21 +153,25 @@ class Game:
 
             self.monsters[key] = Monster(monster['name'], monster['hp'], monster['message'])
 
-    def attack(self):
+    def attack(self, args):
         position = self.player.position()
         key = self.key(position)
 
-        if self.monsters.setdefault(key, None) != None:
-            name, dmg, hp = self.monsters[key].damage()
-            print(f'Attacked {name},  damage {dmg} hp')
-            
-            if hp:
-                print(f'{name} now has {hp}')
-            else:
-                print(f'{name} died')
-                del self.monsters[key]
+        args = shlex.split(args)
+
+        if self.monsters.setdefault(key, None) == None \
+        or self.monsters[key].name != args[0]:
+            print(f'No {args[0]} here')
+            return
+
+        name, dmg, hp = self.monsters[key].damage()
+        print(f'Attacked {name},  damage {dmg} hp')
+        
+        if hp:
+            print(f'{name} now has {hp}')
         else:
-            print('No monster here')
+            print(f'{name} died')
+            del self.monsters[key]
 
 
 
@@ -217,6 +221,6 @@ class MUDcmd(cmd.Cmd):
     def do_attack(self, args):
         'Attack the monster in current position'
 
-        self.game.attack()
+        self.game.attack(args)
 
 MUDcmd().cmdloop()
