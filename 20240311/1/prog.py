@@ -163,10 +163,10 @@ class Game:
     def attack(self, args):
         position = self.player.position()
         key = self.key(position)
-	weapon = None
+        weapon = None
         args = shlex.split(args)
         
-	if self.monsters.setdefault(key, None) == None \
+        if self.monsters.setdefault(key, None) == None \
         or self.monsters[key].name != args[0]:
             print(f'No {args[0]} here')
             return
