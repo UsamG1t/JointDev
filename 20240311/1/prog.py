@@ -27,9 +27,16 @@ class Player:
     'right': {'x': 1, 'y': 0}
     }
 
+    weapons = {
+    'sword': 10,
+    'spear': 15,
+    'axe'  : 20
+    }
+
     def __init__(self):
         self.x = self.y = 0
         self.field_size = 10
+
     
     def position(self):
         return (self.x, self.y)
@@ -55,8 +62,8 @@ class Monster:
         else:
             print(cowsay.cowsay(self.message, cow=self.name))
 
-    def damage(self):
-        dmg = min([self.hp, 10])
+    def damage(self, damage):
+        dmg = min([self.hp, damage])
         self.hp = self.hp - dmg
 
         return (self.name, dmg, self.hp)
@@ -153,12 +160,30 @@ class Game:
 
             self.monsters[key] = Monster(monster['name'], monster['hp'], monster['message'])
 
-    def attack(self):
+    def attack(self, args):
         position = self.player.position()
         key = self.key(position)
 
         if self.monsters.setdefault(key, None) != None:
-            name, dmg, hp = self.monsters[key].damage()
+            weapon = None
+            args = shlex.split(args)
+            match args:
+                case ['with', weapon_type]:
+                    if weapon_type not in self.player.weapons.keys():
+                        print('Unknown weapon')
+                    else:
+                        weapon = {'type'  : weapon_type,
+                                  'damage': self.player.weapons[weapon_type]}
+                case []:
+                    weapon = {'type'  : 'sword',
+                              'damage': self.player.weapons['sword']}
+                case _:
+                    print('Invalid command')
+
+            if not weapon:
+                return
+
+            name, dmg, hp = self.monsters[key].damage(weapon['damage'])
             print(f'Attacked {name},  damage {dmg} hp')
             
             if hp:
@@ -217,6 +242,15 @@ class MUDcmd(cmd.Cmd):
     def do_attack(self, args):
         'Attack the monster in current position'
 
-        self.game.attack()
+        self.game.attack(args)
+
+    def complete_attack(self, text, line, begidx, endidx):
+        words = (line[:endidx] + ".").split()
+        DICT = []
+        match len(words):
+            case 3:
+                if words[1].startswith('with'):
+                    DICT = self.game.player.weapons.keys()
+        return [c for c in DICT if c.startswith(text)]
 
 MUDcmd().cmdloop()
