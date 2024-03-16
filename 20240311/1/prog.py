@@ -164,35 +164,37 @@ class Game:
         position = self.player.position()
         key = self.key(position)
 
-        if self.monsters.setdefault(key, None) != None:
-            weapon = None
-            args = shlex.split(args)
-            match args:
-                case ['with', weapon_type]:
-                    if weapon_type not in self.player.weapons.keys():
-                        print('Unknown weapon')
-                    else:
-                        weapon = {'type'  : weapon_type,
-                                  'damage': self.player.weapons[weapon_type]}
-                case []:
-                    weapon = {'type'  : 'sword',
-                              'damage': self.player.weapons['sword']}
-                case _:
-                    print('Invalid command')
-
-            if not weapon:
-                return
-
-            name, dmg, hp = self.monsters[key].damage(weapon['damage'])
-            print(f'Attacked {name},  damage {dmg} hp')
-            
-            if hp:
-                print(f'{name} now has {hp}')
-            else:
-                print(f'{name} died')
-                del self.monsters[key]
-        else:
+        args = shlex.split(args)
+        weapon = None
+        
+        if self.monsters.setdefault(key, None) == None:
             print('No monster here')
+            return
+
+        match args:
+            case ['with', weapon_type]:
+                if weapon_type not in self.player.weapons.keys():
+                    print('Unknown weapon')
+                else:
+                    weapon = {'type'  : weapon_type,
+                              'damage': self.player.weapons[weapon_type]}
+            case []:
+                weapon = {'type'  : 'sword',
+                          'damage': self.player.weapons['sword']}
+            case _:
+                print('Invalid command')
+
+        if not weapon:
+            return
+
+        name, dmg, hp = self.monsters[key].damage(weapon['damage'])
+        print(f'Attacked {name},  damage {dmg} hp')
+        
+        if hp:
+            print(f'{name} now has {hp}')
+        else:
+            print(f'{name} died')
+            del self.monsters[key]
 
 
 
