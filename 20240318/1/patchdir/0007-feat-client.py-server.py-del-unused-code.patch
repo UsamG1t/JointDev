@@ -1,0 +1,342 @@
+From 6823ab6ed40a56e7fafba8a5b7b811c4e6efe62c Mon Sep 17 00:00:00 2001
+From: Stephen <UsamUNX>
+Date: Sun, 24 Mar 2024 22:49:28 +0300
+Subject: [PATCH 7/7] feat client.py server.py: del unused code
+
+---
+ 20240318/1/client.py |   6 +-
+ 20240318/1/server.py | 145 +++++++------------------------------------
+ 2 files changed, 22 insertions(+), 129 deletions(-)
+
+diff --git a/20240318/1/client.py b/20240318/1/client.py
+index 14fd0bd..3d076a8 100644
+--- a/20240318/1/client.py
++++ b/20240318/1/client.py
+@@ -245,8 +245,4 @@ if __name__ == '__main__':
+     port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
+     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+         s.connect((host, port))
+-        MUDcmd(s).cmdloop()
+-    
+-    # while msg := sys.stdin.buffer.readline():
+-    #     s.sendall(msg)
+-    #     print(s.recv(1024).rstrip().decode())
+\ No newline at end of file
++        MUDcmd(s).cmdloop()
+\ No newline at end of file
+diff --git a/20240318/1/server.py b/20240318/1/server.py
+index ec78319..2d646e0 100644
+--- a/20240318/1/server.py
++++ b/20240318/1/server.py
+@@ -1,28 +1,11 @@
+ import cowsay
+ import shlex
+-import io
+ import cmd
+ 
+ import socket
+ import sys
+ import multiprocessing
+ 
+-custom_monster = cowsay.read_dot_cow(io.StringIO("""
+-$the_cow = <<EOC;
+-         $thoughts
+-          $thoughts
+-    ,_                    _,
+-    ) '-._  ,_    _,  _.-' (
+-    )  _.-'.|\\--//|.'-._  (
+-     )'   .'\/o\/o\/'.   `(
+-      ) .' . \====/ . '. (
+-       )  / <<    >> \  (
+-        '-._/``  ``\_.-'
+-  jgs     __\\'--'//__
+-         (((""`  `"")))
+-EOC
+-"""))
+-
+ class Player:
+     steps = {
+     'up'   : {'x': 0, 'y':-1},
+@@ -41,12 +24,10 @@ class Player:
+         self.x = self.y = 0
+         self.field_size = 10
+ 
+-    
+     def position(self):
+         return (self.x, self.y)
+ 
+     def move(self, method, args):
+-        print(method, args)
+         self.x = (self.x + self.field_size
+                  + self.steps[method]['x']) % self.field_size
+         self.y = (self.y + self.field_size
+@@ -54,7 +35,6 @@ class Player:
+ 
+         return self.position()
+ 
+-
+ class Monster:
+     def __init__(self, name, hp, message):
+         self.name = name
+@@ -62,11 +42,6 @@ class Monster:
+         self.message = message
+     
+     def encounter(self):
+-        if self.name == 'jgsbat':
+-            print(cowsay.cowsay(self.message, cowfile=custom_monster))
+-        else:
+-            print(cowsay.cowsay(self.message, cow=self.name))
+-
+         return (self.name, self.message)
+ 
+     def damage(self, damage):
+@@ -87,9 +62,10 @@ class Game:
+     
+     def move(self, method, args):
+         response = []
++        print("LOG: ", 'move', method, args)
++
+         position = self.player.move(method, args)
+ 
+-        print(f'Moved to ({position[0]}, {position[1]})')
+         response.append(str(position[0]))
+         response.append(str(position[1]))
+ 
+@@ -99,30 +75,28 @@ class Game:
+             response.append(result[0])
+             response.append(result[1])
+ 
+-        print(f'response == {response}')
++        print("LOG: response", response)
+         return response
+ 
+     def addmon(self, args):
+         response = []
+         broken = False
+         monster = {}
+-
+         args = shlex.split(args)
+ 
++        print("LOG: ", 'addmon', args)
++
+         if len(args) != 8:
+             broken = True
+-            print('Invalid arguments (count of elements)')
+             response.append('1')
+ 
+         elif not isinstance(args[0], str):
+             broken = True
+-            print('Invalid arguments (type of name)')
+             response.append('2')
+ 
+         elif args[0] not in cowsay.list_cows() \
+                 and args[0] != 'jgsbat':
+             broken = True
+-            print('Cannot add unknown monster')
+             response.append('3')
+         else:
+             monster = {"name": args[0]}
+@@ -132,43 +106,36 @@ class Game:
+                     case 'hello':
+                         if not isinstance(args[i+1], str):
+                             broken = True
+-                            print('Invalid arguments (type of message)')
+                             response.append('4')
+                             break
+                         monster["message"] = args[i+1]
+                     case 'hp':
+                         if not args[i+1].isdigit():
+                             broken = True
+-                            print('Invalid arguments (type of hp)')
+                             response.append('5')
+                             break
+                         if int(args[i+1]) <= 0:
+                             broken = True
+-                            print('Invalid arguments (value of hp)')
+                             response.append('6')
+                             break
+                         monster["hp"] = int(args[i+1])
+                     case 'coord':
+                         if not args[i+1].isdigit():
+                             broken = True
+-                            print('Invalid arguments (type of coord x')
+                             response.append('7')
+                             break
+                         if int(args[i+1]) < 0 \
+                                 or int(args[i+1]) >= self.field_size:
+                             broken = True
+-                            print('Invalid arguments (value of coord x)')
+                             response.append('8')
+                             break
+                         if not args[i+2].isdigit():
+                             broken = True
+-                            print('Invalid arguments (type of coord y')
+                             response.append('9')
+                             break
+                         if int(args[i+2]) < 0 \
+                                 or int(args[i+2]) >= self.field_size:
+                             broken = True
+-                            print('Invalid arguments (value of coord y)')
+                             response.append('10')
+                             break
+                         m_x = int(args[i+1])
+@@ -176,7 +143,6 @@ class Game:
+                     case _: continue
+ 
+         if not broken:
+-            print(f'Added monster {monster["name"]} to ({m_x}, {m_y}) saying {monster["message"]}')
+             response.append('0')
+             response.append(monster["name"])
+             response.append(str(m_x))
+@@ -186,11 +152,11 @@ class Game:
+             key = self.key((m_x, m_y))
+             if self.monsters.setdefault(key, None) != None:
+                 del self.monsters[key]
+-                print("Replaced the old monster")
+                 response.append("Replaced the old monster")
+ 
+             self.monsters[key] = Monster(monster['name'], monster['hp'], monster['message'])
+ 
++        print("LOG: response", response)
+         return response
+ 
+     def attack(self, args):
+@@ -198,101 +164,32 @@ class Game:
+         position = self.player.position()
+         key = self.key(position)
+         args = shlex.split(args)
+-        
++        print("LOG: ", 'attack', args)
++
+         if self.monsters.setdefault(key, None) == None \
+         or self.monsters[key].name != args[0]:
+-            print(f'No {args[0]} here')
+             response.append('1')
+             return response
+ 
+         name, dmg, hp = self.monsters[key].damage(int(args[1]))
+-        print(f'Attacked {name},  damage {dmg} hp')
+         response.append('0')
+-        
+-        if hp:
+-            print(f'{name} now has {hp}')
+-        else:
+-            print(f'{name} died')
+-            del self.monsters[key]
+-
+         response.append(str(dmg))
+         response.append(str(hp))
+-        return response
+-
+-
+-# class MUDcmd(cmd.Cmd):
+-
+-#     def __init__(self):
+-#         self.game = Game()
+-#         print("<<< Welcome to Python-MUD 0.1 >>>")
+-#         return super().__init__()
+-
+-#     prompt = ">> "
+-
+-#     def do_EOF(self, args):
+-#         'Stops game by ^D combination'
+-#         return 1
+-#     def emptyline(self):
+-#         'auto-repeat of last command OFF'
+-#         return
+-    
+-#     def do_up(self, args):
+-#         'one step UP on field'
+-#         self.game.move('up', args)
+-#     def do_down(self, args):
+-#         'one step DOWN on field'
+-#         self.game.move('down', args)
+-#     def do_left(self, args):
+-#         'one step LEFT on field'
+-#         self.game.move('left', args)
+-#     def do_right(self, args):
+-#         'one step RIGHT on field'
+-#         self.game.move('right', args)
+-    
+-#     def do_addmon(self, args):
+-#         '''
+-#         Add monster on the position
+-
+-#         first argument is a name of monster from [cowsay.list_cows() | 'jgsbat']
+-
+-#         Other required args (their order is not important):
+         
+-#         1. coord <int[0...field_size)> <int[0...field_size)>
+-#         2. hp <int[0...inf)>
+-#         3. hello <string (with quotation for more than one word)>
+-#         '''
+-#         self.game.addmon(args)
+-
+-#     def do_attack(self, args):
+-#         'Attack the monster in current position'
+-
+-#         self.game.attack(args)
+-
+-#     def complete_attack(self, text, line, begidx, endidx):
+-#         words = (line[:endidx] + ".").split()
+-#         DICT = []
+-#         match len(words):
+-#             case 2:
+-#                 DICT = cowsay.list_cows() + ['jgsbat']
+-#             case 4:
+-#                 if words[2].startswith('with'):
+-#                     DICT = self.game.player.weapons.keys()
+-#         return [c for c in DICT if c.startswith(text)]
+-
+-# if __name__ == '__main__':
+-#     MUDcmd().cmdloop()
+-
+-
++        if not hp:
++            del self.monsters[key]
+ 
++        print("LOG: response", response)
++        return response
+ 
+ def handler(conn, addr):
+     with conn:
+-        print('Connected by', addr)
++        print("LOG: ", 'Connected by', addr)
+         game = Game()
+         while data := conn.recv(1024).decode():
+             cmd, *args = shlex.split(data)
+-            print(addr, data)
+-            print(args)
++            print("LOG: ", addr, data)
++            print("LOG: ", args)
+             match cmd:
+                 case 'move':
+                     method, *args = args
+@@ -304,17 +201,17 @@ def handler(conn, addr):
+                 case 'attack':
+                     response = game.attack(shlex.join(args))
+                     conn.sendall(shlex.join(response).encode())
+-        print("i vsyo")
++        print("LOG: client has left")
+         
+ host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
+ port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
+ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+     s.bind((host, port))
+     s.listen()
+-    # while True:
+-    #     conn, addr = s.accept()
+-    #     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+-
+     conn, addr = s.accept()
+     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+-    print("Server stop working")
++    print("LOG: Server stop listening for new connections")
++
++    # while True:
++    #     conn, addr = s.accept()
++    #     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+\ No newline at end of file
+-- 
+2.34.1
+

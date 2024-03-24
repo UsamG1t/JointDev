@@ -1,0 +1,303 @@
+From a33d789c37056b00f942ccdb247083c72b7bc322 Mon Sep 17 00:00:00 2001
+From: Stephen <UsamUNX>
+Date: Sun, 24 Mar 2024 11:58:36 +0300
+Subject: [PATCH 2/7] feat server.py: add responses sending to client
+
+---
+ 20240318/1/server.py | 144 ++++++++++++++++++++++++++-----------------
+ 1 file changed, 88 insertions(+), 56 deletions(-)
+
+diff --git a/20240318/1/server.py b/20240318/1/server.py
+index 45064f9..daaa497 100644
+--- a/20240318/1/server.py
++++ b/20240318/1/server.py
+@@ -67,6 +67,8 @@ class Monster:
+         else:
+             print(cowsay.cowsay(self.message, cow=self.name))
+ 
++        return (self.name, self.message)
++
+     def damage(self, damage):
+         dmg = min([self.hp, damage])
+         self.hp = self.hp - dmg
+@@ -84,16 +86,20 @@ class Game:
+         return position[1] * self.field_size + position[0]
+     
+     def move(self, method, args):
++        response = []
+         position = self.player.move(method, args)
+ 
+         print(f'Moved to ({position[0]}, {position[1]})')
++        response = [f'Moved to ({position[0]}, {position[1]})', None, None]
+ 
+         key = self.key(position)
+         if self.monsters.setdefault(key, None) != None:
+-            self.monsters[key].encounter()
++            response[1], response[2] = self.monsters[key].encounter()
+ 
++        return response
+ 
+     def addmon(self, args):
++        response = []
+         broken = False
+         monster = {}
+ 
+@@ -102,15 +108,18 @@ class Game:
+         if len(args) != 8:
+             broken = True
+             print('Invalid arguments (count of elements)')
++            response.append('Invalid arguments (count of elements)')
+ 
+         elif not isinstance(args[0], str):
+             broken = True
+             print('Invalid arguments (type of name)')
++            response.append('Invalid arguments (type of name)')
+ 
+         elif args[0] not in cowsay.list_cows() \
+                 and args[0] != 'jgsbat':
+             broken = True
+             print('Cannot add unknown monster')
++            response.append('Cannot add unknown monster')
+         else:
+             monster = {"name": args[0]}
+ 
+@@ -120,36 +129,43 @@ class Game:
+                         if not isinstance(args[i+1], str):
+                             broken = True
+                             print('Invalid arguments (type of message)')
++                            response.append('Invalid arguments (type of message)')
+                             break
+                         monster["message"] = args[i+1]
+                     case 'hp':
+                         if not args[i+1].isdigit():
+                             broken = True
+                             print('Invalid arguments (type of hp)')
++                            response.append('Invalid arguments (type of hp)')
+                             break
+                         if int(args[i+1]) <= 0:
+                             broken = True
+                             print('Invalid arguments (value of hp)')
++                            response.append('Invalid arguments (value of hp)')
+                             break
+                         monster["hp"] = int(args[i+1])
+                     case 'coord':
+                         if not args[i+1].isdigit():
+                             broken = True
+                             print('Invalid arguments (type of coord x')
++                            response.append('Invalid arguments (type of coord x')
+                             break
+                         if int(args[i+1]) < 0 \
+                                 or int(args[i+1]) >= self.field_size:
+                             broken = True
+                             print('Invalid arguments (value of coord x)')
++                            response.append('Invalid arguments (value of coord x)')
+                             break
+                         if not args[i+2].isdigit():
+                             broken = True
+                             print('Invalid arguments (type of coord y')
++                            response.append('Invalid arguments (type of coord y')
+                             break
+                         if int(args[i+2]) < 0 \
+                                 or int(args[i+2]) >= self.field_size:
+                             broken = True
+                             print('Invalid arguments (value of coord y)')
++                            response.append('Invalid arguments (value of coord y)')
+                             break
+                         m_x = int(args[i+1])
+                         m_y = int(args[i+2])
+@@ -157,15 +173,20 @@ class Game:
+ 
+         if not broken:
+             print(f'Added monster {monster["name"]} to ({m_x}, {m_y}) saying {monster["message"]}')
++            response.append(f'Added monster {monster["name"]} to ({m_x}, {m_y}) saying {monster["message"]}')
+             
+             key = self.key((m_x, m_y))
+             if self.monsters.setdefault(key, None) != None:
+                 del self.monsters[key]
+                 print("Replaced the old monster")
++                response.append("Replaced the old monster")
+ 
+             self.monsters[key] = Monster(monster['name'], monster['hp'], monster['message'])
+ 
++        return response
++
+     def attack(self, args):
++        response = []
+         position = self.player.position()
+         key = self.key(position)
+         weapon = None
+@@ -174,12 +195,14 @@ class Game:
+         if self.monsters.setdefault(key, None) == None \
+         or self.monsters[key].name != args[0]:
+             print(f'No {args[0]} here')
+-            return
++            response.append(f'No {args[0]} here')
++            return response
+ 
+         match args:
+             case [name, 'with', weapon_type]:
+                 if weapon_type not in self.player.weapons.keys():
+                     print('Unknown weapon')
++                    response.append('Unknown weapon')
+                 else:
+                     weapon = {'type'  : weapon_type,
+                               'damage': self.player.weapons[weapon_type]}
+@@ -188,79 +211,85 @@ class Game:
+                           'damage': self.player.weapons['sword']}
+             case _:
+                 print('Invalid command')
++                response.append('Invalid command')
+ 
+         if not weapon:
+-            return
++            print(response)
++            return response
+ 
+         name, dmg, hp = self.monsters[key].damage(weapon['damage'])
+         print(f'Attacked {name},  damage {dmg} hp')
++        response.append(f'Attacked {name},  damage {dmg} hp')
+         
+         if hp:
+             print(f'{name} now has {hp}')
++            response.append(f'{name} now has {hp}')
+         else:
+             print(f'{name} died')
++            response.append(f'{name} died')
+             del self.monsters[key]
+ 
++        return response
+ 
+ 
+-class MUDcmd(cmd.Cmd):
++# class MUDcmd(cmd.Cmd):
+ 
+-    def __init__(self):
+-        self.game = Game()
+-        print("<<< Welcome to Python-MUD 0.1 >>>")
+-        return super().__init__()
+-
+-    prompt = ">> "
+-
+-    def do_EOF(self, args):
+-        'Stops game by ^D combination'
+-        return 1
+-    def emptyline(self):
+-        'auto-repeat of last command OFF'
+-        return
++#     def __init__(self):
++#         self.game = Game()
++#         print("<<< Welcome to Python-MUD 0.1 >>>")
++#         return super().__init__()
++
++#     prompt = ">> "
++
++#     def do_EOF(self, args):
++#         'Stops game by ^D combination'
++#         return 1
++#     def emptyline(self):
++#         'auto-repeat of last command OFF'
++#         return
+     
+-    def do_up(self, args):
+-        'one step UP on field'
+-        self.game.move('up', args)
+-    def do_down(self, args):
+-        'one step DOWN on field'
+-        self.game.move('down', args)
+-    def do_left(self, args):
+-        'one step LEFT on field'
+-        self.game.move('left', args)
+-    def do_right(self, args):
+-        'one step RIGHT on field'
+-        self.game.move('right', args)
++#     def do_up(self, args):
++#         'one step UP on field'
++#         self.game.move('up', args)
++#     def do_down(self, args):
++#         'one step DOWN on field'
++#         self.game.move('down', args)
++#     def do_left(self, args):
++#         'one step LEFT on field'
++#         self.game.move('left', args)
++#     def do_right(self, args):
++#         'one step RIGHT on field'
++#         self.game.move('right', args)
+     
+-    def do_addmon(self, args):
+-        '''
+-        Add monster on the position
++#     def do_addmon(self, args):
++#         '''
++#         Add monster on the position
+ 
+-        first argument is a name of monster from [cowsay.list_cows() | 'jgsbat']
++#         first argument is a name of monster from [cowsay.list_cows() | 'jgsbat']
+ 
+-        Other required args (their order is not important):
++#         Other required args (their order is not important):
+         
+-        1. coord <int[0...field_size)> <int[0...field_size)>
+-        2. hp <int[0...inf)>
+-        3. hello <string (with quotation for more than one word)>
+-        '''
+-        self.game.addmon(args)
+-
+-    def do_attack(self, args):
+-        'Attack the monster in current position'
+-
+-        self.game.attack(args)
+-
+-    def complete_attack(self, text, line, begidx, endidx):
+-        words = (line[:endidx] + ".").split()
+-        DICT = []
+-        match len(words):
+-            case 2:
+-                DICT = cowsay.list_cows() + ['jgsbat']
+-            case 4:
+-                if words[2].startswith('with'):
+-                    DICT = self.game.player.weapons.keys()
+-        return [c for c in DICT if c.startswith(text)]
++#         1. coord <int[0...field_size)> <int[0...field_size)>
++#         2. hp <int[0...inf)>
++#         3. hello <string (with quotation for more than one word)>
++#         '''
++#         self.game.addmon(args)
++
++#     def do_attack(self, args):
++#         'Attack the monster in current position'
++
++#         self.game.attack(args)
++
++#     def complete_attack(self, text, line, begidx, endidx):
++#         words = (line[:endidx] + ".").split()
++#         DICT = []
++#         match len(words):
++#             case 2:
++#                 DICT = cowsay.list_cows() + ['jgsbat']
++#             case 4:
++#                 if words[2].startswith('with'):
++#                     DICT = self.game.player.weapons.keys()
++#         return [c for c in DICT if c.startswith(text)]
+ 
+ # if __name__ == '__main__':
+ #     MUDcmd().cmdloop()
+@@ -279,12 +308,15 @@ def handler(conn, addr):
+                 case 'move':
+                     method, *args = args
+                     response = game.move(method, shlex.join(args))
++                    conn.sendall(shlex.join(response).encode())
+                 case 'addmon':
+                     response = game.addmon(shlex.join(args))
++                    conn.sendall(shlex.join(response).encode())
+                 case 'attack':
+                     response = game.attack(shlex.join(args))
++                    conn.sendall(shlex.join(response).encode())
+                 
+-            conn.sendall("done\n".encode())
++            conn.sendall("\ndone\n".encode())
+         print("i vsyo")
+         
+ host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
+-- 
+2.34.1
+
