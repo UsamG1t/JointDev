@@ -90,11 +90,15 @@ class Game:
         position = self.player.move(method, args)
 
         print(f'Moved to ({position[0]}, {position[1]})')
-        response = [f'Moved to ({position[0]}, {position[1]})', None, None]
+        response.append(f'Moved to ({position[0]}, {position[1]})')
+        response.append(str(position[0]))
+        response.append(str(position[1]))
 
         key = self.key(position)
         if self.monsters.setdefault(key, None) != None:
-            response[1], response[2] = self.monsters[key].encounter()
+            result = self.monsters[key].encounter()
+            response.append(result[0])
+            response.append(result[1])
 
         return response
 
@@ -108,17 +112,20 @@ class Game:
         if len(args) != 8:
             broken = True
             print('Invalid arguments (count of elements)')
+            response.append('1')
             response.append('Invalid arguments (count of elements)')
 
         elif not isinstance(args[0], str):
             broken = True
             print('Invalid arguments (type of name)')
+            response.append('2')
             response.append('Invalid arguments (type of name)')
 
         elif args[0] not in cowsay.list_cows() \
                 and args[0] != 'jgsbat':
             broken = True
             print('Cannot add unknown monster')
+            response.append('3')
             response.append('Cannot add unknown monster')
         else:
             monster = {"name": args[0]}
@@ -129,6 +136,7 @@ class Game:
                         if not isinstance(args[i+1], str):
                             broken = True
                             print('Invalid arguments (type of message)')
+                            response.append('4')
                             response.append('Invalid arguments (type of message)')
                             break
                         monster["message"] = args[i+1]
@@ -136,11 +144,13 @@ class Game:
                         if not args[i+1].isdigit():
                             broken = True
                             print('Invalid arguments (type of hp)')
+                            response.append('5')
                             response.append('Invalid arguments (type of hp)')
                             break
                         if int(args[i+1]) <= 0:
                             broken = True
                             print('Invalid arguments (value of hp)')
+                            response.append('6')
                             response.append('Invalid arguments (value of hp)')
                             break
                         monster["hp"] = int(args[i+1])
@@ -148,23 +158,27 @@ class Game:
                         if not args[i+1].isdigit():
                             broken = True
                             print('Invalid arguments (type of coord x')
+                            response.append('7')
                             response.append('Invalid arguments (type of coord x')
                             break
                         if int(args[i+1]) < 0 \
                                 or int(args[i+1]) >= self.field_size:
                             broken = True
                             print('Invalid arguments (value of coord x)')
+                            response.append('8')
                             response.append('Invalid arguments (value of coord x)')
                             break
                         if not args[i+2].isdigit():
                             broken = True
                             print('Invalid arguments (type of coord y')
+                            response.append('9')
                             response.append('Invalid arguments (type of coord y')
                             break
                         if int(args[i+2]) < 0 \
                                 or int(args[i+2]) >= self.field_size:
                             broken = True
                             print('Invalid arguments (value of coord y)')
+                            response.append('10')
                             response.append('Invalid arguments (value of coord y)')
                             break
                         m_x = int(args[i+1])
@@ -173,6 +187,7 @@ class Game:
 
         if not broken:
             print(f'Added monster {monster["name"]} to ({m_x}, {m_y}) saying {monster["message"]}')
+            response.append('0')
             response.append(f'Added monster {monster["name"]} to ({m_x}, {m_y}) saying {monster["message"]}')
             
             key = self.key((m_x, m_y))
@@ -195,6 +210,7 @@ class Game:
         if self.monsters.setdefault(key, None) == None \
         or self.monsters[key].name != args[0]:
             print(f'No {args[0]} here')
+            response.append('1')
             response.append(f'No {args[0]} here')
             return response
 
@@ -202,6 +218,7 @@ class Game:
             case [name, 'with', weapon_type]:
                 if weapon_type not in self.player.weapons.keys():
                     print('Unknown weapon')
+                    response.append('2')
                     response.append('Unknown weapon')
                 else:
                     weapon = {'type'  : weapon_type,
@@ -211,14 +228,15 @@ class Game:
                           'damage': self.player.weapons['sword']}
             case _:
                 print('Invalid command')
+                response.append('3')
                 response.append('Invalid command')
 
         if not weapon:
-            print(response)
             return response
 
         name, dmg, hp = self.monsters[key].damage(weapon['damage'])
         print(f'Attacked {name},  damage {dmg} hp')
+        response.append('0')
         response.append(f'Attacked {name},  damage {dmg} hp')
         
         if hp:
@@ -229,6 +247,8 @@ class Game:
             response.append(f'{name} died')
             del self.monsters[key]
 
+        response.append(str(dmg))
+        response.append(str(hp))
         return response
 
 
@@ -303,7 +323,7 @@ def handler(conn, addr):
         game = Game()
         while data := conn.recv(1024).decode():
             cmd, *args = shlex.split(data)
-
+            print(addr, data)
             match cmd:
                 case 'move':
                     method, *args = args
