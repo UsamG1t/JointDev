@@ -90,7 +90,7 @@ class Game:
         position = self.player.move(method, args)
 
         print(f'Moved to ({position[0]}, {position[1]})')
-        response.append(f'Moved to ({position[0]}, {position[1]})')
+        # response.append(f'Moved to ({position[0]}, {position[1]})')
         response.append(str(position[0]))
         response.append(str(position[1]))
 
@@ -100,6 +100,7 @@ class Game:
             response.append(result[0])
             response.append(result[1])
 
+        print(f'response == {response}')
         return response
 
     def addmon(self, args):
@@ -335,8 +336,6 @@ def handler(conn, addr):
                 case 'attack':
                     response = game.attack(shlex.join(args))
                     conn.sendall(shlex.join(response).encode())
-                
-            conn.sendall("\ndone\n".encode())
         print("i vsyo")
         
 host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
