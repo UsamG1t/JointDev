@@ -246,7 +246,3 @@ if __name__ == '__main__':
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((host, port))
         MUDcmd(s).cmdloop()
-    
-    # while msg := sys.stdin.buffer.readline():
-    #     s.sendall(msg)
-    #     print(s.recv(1024).rstrip().decode())
