@@ -18,6 +18,12 @@ addmon_errors = {
     '10': 'Invalid arguments (value of coord y)'
 }
 
+weapons = {
+'sword': 10,
+'spear': 15,
+'axe'  : 20
+}
+
 custom_monster = cowsay.read_dot_cow(io.StringIO("""
 $the_cow = <<EOC;
          $thoughts
@@ -53,11 +59,22 @@ def addmon_answer(code, name = None, x = None, y = None, msg = None, replace_che
     if replace_check:
         print(replace_check)
 
+def attack_answer(name, code, dmg = None, hp = None):
+    if code == '1':
+        print(f'No {name} here')
+        return
+
+    print(f'Attacked {name}, damage {dmg} hp')
+
+    if hp != '0':
+        print(f'{name} now has {hp}')
+    else:
+        print(f'{name} died')
+
 
 class  MUDcmd(cmd.Cmd):
 
     def __init__(self, socket):
-        # self.game = Game()
         self.field_size = 10
         self.socket = socket
         print("<<< Welcome to Python-MUD 0.1 >>>")
@@ -74,7 +91,7 @@ class  MUDcmd(cmd.Cmd):
     
     def do_up(self, args):
         'one step UP on field'
-        # self.game.move('up', args)
+        
         self.socket.sendall(f'move up'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
@@ -82,7 +99,7 @@ class  MUDcmd(cmd.Cmd):
     
     def do_down(self, args):
         'one step DOWN on field'
-        # self.game.move('down', args)
+        
         self.socket.sendall(f'move down'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
@@ -90,7 +107,7 @@ class  MUDcmd(cmd.Cmd):
     
     def do_left(self, args):
         'one step LEFT on field'
-        # self.game.move('left', args)
+        
         self.socket.sendall(f'move left'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
@@ -98,7 +115,7 @@ class  MUDcmd(cmd.Cmd):
     
     def do_right(self, args):
         'one step RIGHT on field'
-        # self.game.move('right', args)
+        
         self.socket.sendall(f'move right'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
@@ -116,8 +133,7 @@ class  MUDcmd(cmd.Cmd):
         2. hp <int[0...inf)>
         3. hello <string (with quotation for more than one word)>
         '''
-        # self.game.addmon(args)
-
+        
         args = shlex.split(args)
         broken = False
 
@@ -184,21 +200,42 @@ class  MUDcmd(cmd.Cmd):
             addmon_answer(*response)
 
 
-    # def do_attack(self, args):
-    #     'Attack the monster in current position'
+    def do_attack(self, args):
+        'Attack the monster in current position'
 
-    #     self.game.attack(args)
+        weapon = None
+        args = shlex.split(args)
+        
+        match args:
+            case [name, 'with', weapon_type]:
+                if weapon_type not in weapons.keys():
+                    print('client: Unknown weapon')
+                else:
+                    weapon = {'type'  : weapon_type,
+                              'damage': weapons[weapon_type]}
+            case [name]:
+                weapon = {'type'  : 'sword',
+                          'damage': weapons['sword']}
+            case _:
+                print('client: Invalid command')
 
-    # def complete_attack(self, text, line, begidx, endidx):
-    #     words = (line[:endidx] + ".").split()
-    #     DICT = []
-    #     match len(words):
-    #         case 2:
-    #             DICT = cowsay.list_cows() + ['jgsbat']
-    #         case 4:
-    #             if words[2].startswith('with'):
-    #                 DICT = self.game.player.weapons.keys()
-    #     return [c for c in DICT if c.startswith(text)]
+        if weapon:
+            self.socket.sendall(f'attack {args[0]} {weapon["damage"]}'.encode())
+            response = self.socket.recv(1024).rstrip().decode()
+            response = shlex.split(response)
+            attack_answer(args[0], *response)
+
+
+    def complete_attack(self, text, line, begidx, endidx):
+        words = (line[:endidx] + ".").split()
+        DICT = []
+        match len(words):
+            case 2:
+                DICT = cowsay.list_cows() + ['jgsbat']
+            case 4:
+                if words[2].startswith('with'):
+                    DICT = weapons.keys()
+        return [c for c in DICT if c.startswith(text)]
 
 
 
