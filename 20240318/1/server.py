@@ -3,6 +3,10 @@ import shlex
 import io
 import cmd
 
+import socket
+import sys
+import multiprocessing
+
 custom_monster = cowsay.read_dot_cow(io.StringIO("""
 $the_cow = <<EOC;
          $thoughts
@@ -41,7 +45,8 @@ class Player:
     def position(self):
         return (self.x, self.y)
 
-    def move(self, method, args):        
+    def move(self, method, args):
+        print(method, args)
         self.x = (self.x + self.field_size
                  + self.steps[method]['x']) % self.field_size
         self.y = (self.y + self.field_size
@@ -257,5 +262,40 @@ class MUDcmd(cmd.Cmd):
                     DICT = self.game.player.weapons.keys()
         return [c for c in DICT if c.startswith(text)]
 
-if __name__ == '__main__':
-    MUDcmd().cmdloop()
+# if __name__ == '__main__':
+#     MUDcmd().cmdloop()
+
+
+
+
+def handler(conn, addr):
+    with conn:
+        print('Connected by', addr)
+        game = Game()
+        while data := conn.recv(1024).decode():
+            cmd, *args = shlex.split(data)
+
+            match cmd:
+                case 'move':
+                    method, *args = args
+                    response = game.move(method, shlex.join(args))
+                case 'addmon':
+                    response = game.addmon(shlex.join(args))
+                case 'attack':
+                    response = game.attack(shlex.join(args))
+                
+            conn.sendall("done\n".encode())
+        print("i vsyo")
+        
+host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
+port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((host, port))
+    s.listen()
+    # while True:
+    #     conn, addr = s.accept()
+    #     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+
+    conn, addr = s.accept()
+    multiprocessing.Process(target=handler, args=(conn, addr)).start()
+    print("Server stop working")
