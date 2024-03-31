@@ -34,14 +34,15 @@ def move_answer(x, y, name=None, message=None):
     return '\n'.join(response)
 
 
-def addmon_answer(code, name = None, x = None, y = None, msg = None, replace_check=None):
+def addmon_answer(code, name = None, hp = None, x = None, y = None, msg = None, replace_check=None):
     response = []
 
     if code != '0':
         response.append(addmon_errors[code])
         return '\n'.join(response)
 
-    response.append(f'Added monster {name} to ({x}, {y}) saying {msg}')
+    # response.append(f'Added monster {name} with {hp} hp to ({x}, {y}) saying {msg}')
+    response.append(f'Added monster {name} with {hp} hp')
     if replace_check:
         response.append(replace_check)
 
@@ -61,7 +62,7 @@ def attack_answer(name, code, dmg = None, hp = None):
     else:
         response.append(f'{name} died')
 
-    return '\n'.join(response).encode()
+    return '\n'.join(response)
 
 
 
@@ -203,6 +204,7 @@ class Game:
         if not broken:
             response.append('0')
             response.append(monster["name"])
+            response.append(monster["hp"])
             response.append(str(m_x))
             response.append(str(m_y))
             response.append(monster["message"])
@@ -228,9 +230,9 @@ class Game:
         or self.monsters[key].name != args[0]:
             response.append('1')
             return response
-        print("LOG: ", 'attack | after exist_check')
 
         name, dmg, hp = self.monsters[key].damage(int(args[1]))
+        response.append(str(name))
         response.append('0')
         response.append(str(dmg))
         response.append(str(hp))
@@ -280,6 +282,11 @@ async def handler(reader, writer):
                         users[my_id] = my_queue
                         print(f"{client} logs in as {my_id}\n")
 
+                        for user in users.values():
+                            if user is not my_queue:
+                                await user.put(f'{my_id} join the MUD')                    
+                    
+
                     case 'move':
                         method, *args = args
                         response = MUD_GAME.move(my_player, method, shlex.join(args))
@@ -287,19 +294,17 @@ async def handler(reader, writer):
                     case 'addmon':
                         response = MUD_GAME.addmon(shlex.join(args))
                         answer = addmon_answer(*response)
+
+                        for user in users.values():
+                            if user is not my_queue:
+                                await user.put(f'{my_id} {answer}')
                     case 'attack':
                         response = MUD_GAME.attack(my_player, shlex.join(args))
                         answer = attack_answer(*response)
-                    
-                    # case ['yield', msg]:
-                    #     if not my_id:
-                    #         writer.write('NoAccessError: You are non-authorized client, please log in\n'.encode())
-                    #         break
-                        
-                    #     for user in users.values():
-                    #         if user is not my_queue:
-                    #             await user.put(f'{cowsay.cowsay(msg, cow=my_id)}')                    
-                    
+
+                        for user in users.values():
+                            if user is not my_queue:
+                                await user.put(f'{my_id} {answer}')
                     # case ['quit']:
                     #     if not my_id:
                     #         writer.write('NoAccessError: You are non-authorized client, please log in\n'.encode())
@@ -319,6 +324,10 @@ async def handler(reader, writer):
                 receive = asyncio.create_task(my_queue.get())
                 writer.write(f"{request.result()}\n".encode())
                 await writer.drain()
+
+    for user in users.values():
+        if user is not my_queue:
+            await user.put(f'{my_id} left the MUD')
 
     my_cmd.cancel()
     receive.cancel()
