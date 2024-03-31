@@ -1,22 +1,18 @@
-import sys
 import cmd
-import io
-import socket
 import shlex
-import cowsay
 
-addmon_errors = {
-    '1' : 'Invalid arguments (count of elements)',
-    '2' : 'Invalid arguments (type of name)', 
-    '3' : 'Cannot add unknown monster', 
-    '4' : 'Invalid arguments (type of message)', 
-    '5' : 'Invalid arguments (type of hp)', 
-    '6' : 'Invalid arguments (value of hp)', 
-    '7' : 'Invalid arguments (type of coord x', 
-    '8' : 'Invalid arguments (value of coord x)', 
-    '9' : 'Invalid arguments (type of coord y', 
-    '10': 'Invalid arguments (value of coord y)'
-}
+import cowsay
+import io
+
+import readline
+import threading
+import sys
+import socket
+
+def msg_sendreciever(client, socket):
+    while response := socket.recv(1024).rstrip().decode():
+        print(f"\n{response}\n{client.prompt}{readline.get_line_buffer()}", end="", flush=True)
+
 
 weapons = {
 'sword': 10,
@@ -40,38 +36,6 @@ $the_cow = <<EOC;
 EOC
 """))
 
-
-def move_answer(x, y, name=None, message=None):
-    print(f'Moved to ({x}, {y})')
-
-    if name:
-        if name == 'jgsbat':
-            print(cowsay.cowsay(message, cowfile=custom_monster))
-        else:
-            print(cowsay.cowsay(message, cow=name))
-
-def addmon_answer(code, name = None, x = None, y = None, msg = None, replace_check=None):
-    if code != '0':
-        print(addmon_errors[code])
-        return
-
-    print(f'Added monster {name} to ({x}, {y}) saying {msg}')
-    if replace_check:
-        print(replace_check)
-
-def attack_answer(name, code, dmg = None, hp = None):
-    if code == '1':
-        print(f'No {name} here')
-        return
-
-    print(f'Attacked {name}, damage {dmg} hp')
-
-    if hp != '0':
-        print(f'{name} now has {hp}')
-    else:
-        print(f'{name} died')
-
-
 class  MUDcmd(cmd.Cmd):
 
     def __init__(self, socket):
@@ -93,33 +57,33 @@ class  MUDcmd(cmd.Cmd):
         'one step UP on field'
         
         self.socket.sendall(f'move up\n'.encode())
-        response = self.socket.recv(1024).rstrip().decode()
-        response = shlex.split(response)
-        move_answer(*response)
+        # response = self.socket.recv(1024).rstrip().decode()
+        # response = shlex.split(response)
+        # move_answer(*response)
     
     def do_down(self, args):
         'one step DOWN on field'
         
         self.socket.sendall(f'move down\n'.encode())
-        response = self.socket.recv(1024).rstrip().decode()
-        response = shlex.split(response)
-        move_answer(*response)
+        # response = self.socket.recv(1024).rstrip().decode()
+        # response = shlex.split(response)
+        # move_answer(*response)
     
     def do_left(self, args):
         'one step LEFT on field'
         
         self.socket.sendall(f'move left\n'.encode())
-        response = self.socket.recv(1024).rstrip().decode()
-        response = shlex.split(response)
-        move_answer(*response)
+        # response = self.socket.recv(1024).rstrip().decode()
+        # response = shlex.split(response)
+        # move_answer(*response)
     
     def do_right(self, args):
         'one step RIGHT on field'
         
         self.socket.sendall(f'move right\n'.encode())
-        response = self.socket.recv(1024).rstrip().decode()
-        response = shlex.split(response)
-        move_answer(*response)
+        # response = self.socket.recv(1024).rstrip().decode()
+        # response = shlex.split(response)
+        # move_answer(*response)
     
     def do_addmon(self, args):
         '''
@@ -195,9 +159,9 @@ class  MUDcmd(cmd.Cmd):
                     case _: continue
         if not broken:
             self.socket.sendall(f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"\n'.encode())
-            response = self.socket.recv(1024).rstrip().decode()
-            response = shlex.split(response)
-            addmon_answer(*response)
+            # response = self.socket.recv(1024).rstrip().decode()
+            # response = shlex.split(response)
+            # addmon_answer(*response)
 
 
     def do_attack(self, args):
@@ -221,9 +185,9 @@ class  MUDcmd(cmd.Cmd):
 
         if weapon:
             self.socket.sendall(f'attack {args[0]} {weapon["damage"]}\n'.encode())
-            response = self.socket.recv(1024).rstrip().decode()
-            response = shlex.split(response)
-            attack_answer(args[0], *response)
+            # response = self.socket.recv(1024).rstrip().decode()
+            # response = shlex.split(response)
+            # attack_answer(args[0], *response)
 
 
     def complete_attack(self, text, line, begidx, endidx):
@@ -251,6 +215,9 @@ if __name__ == '__main__':
         response = s.recv(1024).rstrip().decode()
         if response[0] == '0':
             print(response[2:])
-            MUDcmd(s).cmdloop()
+            cli = MUDcmd(s)
+            request = threading.Thread(target = msg_sendreciever, args = (cli, cli.socket))
+            request.start()
+            cli.cmdloop()
         else:
             print(response)

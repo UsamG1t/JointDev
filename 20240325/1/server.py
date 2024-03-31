@@ -1,14 +1,69 @@
 import cowsay
 import shlex
 import cmd
-
-import socket
-import sys
-import multiprocessing
-
 import asyncio
 
-Users = {}
+# import socket
+# import sys
+# import multiprocessing
+
+
+addmon_errors = {
+    '1' : 'Invalid arguments (count of elements)',
+    '2' : 'Invalid arguments (type of name)', 
+    '3' : 'Cannot add unknown monster', 
+    '4' : 'Invalid arguments (type of message)', 
+    '5' : 'Invalid arguments (type of hp)', 
+    '6' : 'Invalid arguments (value of hp)', 
+    '7' : 'Invalid arguments (type of coord x', 
+    '8' : 'Invalid arguments (value of coord x)', 
+    '9' : 'Invalid arguments (type of coord y', 
+    '10': 'Invalid arguments (value of coord y)'
+}
+
+def move_answer(x, y, name=None, message=None):
+    response = []
+    response.append(f'Moved to ({x}, {y})')
+
+    if name:
+        if name == 'jgsbat':
+            response.append(cowsay.cowsay(message, cowfile=custom_monster))
+        else:
+            response.append(cowsay.cowsay(message, cow=name))
+
+    return '\n'.join(response)
+
+
+def addmon_answer(code, name = None, x = None, y = None, msg = None, replace_check=None):
+    response = []
+
+    if code != '0':
+        response.append(addmon_errors[code])
+        return '\n'.join(response)
+
+    response.append(f'Added monster {name} to ({x}, {y}) saying {msg}')
+    if replace_check:
+        response.append(replace_check)
+
+    return '\n'.join(response)
+
+def attack_answer(name, code, dmg = None, hp = None):
+    response = []
+    
+    if code == '1':
+        response.append(f'No {name} here')
+        return '\n'.join(response).encode()
+
+    response.append(f'Attacked {name}, damage {dmg} hp')
+
+    if hp != '0':
+        response.append(f'{name} now has {hp}')
+    else:
+        response.append(f'{name} died')
+
+    return '\n'.join(response).encode()
+
+
 
 class Player:
     steps = {
@@ -186,42 +241,6 @@ class Game:
         print("LOG: response", response)
         return response
 
-# def handler(conn, addr):
-#     with conn:
-#         print("LOG: ", 'Connected by', addr)
-#         game = Game()
-#         while data := conn.recv(1024).decode():
-#             cmd, *args = shlex.split(data)
-#             print("LOG: ", addr, data)
-#             print("LOG: ", args)
-#             match cmd:
-#                 case 'move':
-#                     method, *args = args
-#                     response = game.move(method, shlex.join(args))
-#                     conn.sendall(shlex.join(response).encode())
-#                 case 'addmon':
-#                     response = game.addmon(shlex.join(args))
-#                     conn.sendall(shlex.join(response).encode())
-#                 case 'attack':
-#                     response = game.attack(shlex.join(args))
-#                     conn.sendall(shlex.join(response).encode())
-#         print("LOG: client has left")
-        
-# host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
-# port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#     s.bind((host, port))
-#     s.listen()
-#     conn, addr = s.accept()
-#     multiprocessing.Process(target=handler, args=(conn, addr)).start()
-#     print("LOG: Server stop listening for new connections")
-
-#     # while True:
-#     #     conn, addr = s.accept()
-#     #     multiprocessing.Process(target=handler, args=(conn, addr)).start()
-
-# # ______________________________________________
-
 MUD_GAME = Game()
 users = dict()
 
@@ -241,9 +260,13 @@ async def handler(reader, writer):
             if request is my_cmd:
                 my_cmd = asyncio.create_task(reader.readline())
                 print(f'{client}: {request.result()}')
+                if (not request.result()):
+                    break;
+
                 cmd, *args = shlex.split(request.result().decode())
                 print("LOG: ", client, request.result().decode())
                 print("LOG: ", args)
+                answer = ""
                 match cmd:
                     case 'register':
                         if args[0] in users.keys():
@@ -260,13 +283,13 @@ async def handler(reader, writer):
                     case 'move':
                         method, *args = args
                         response = MUD_GAME.move(my_player, method, shlex.join(args))
-                        writer.write(shlex.join(response).encode())
+                        answer = move_answer(*response)
                     case 'addmon':
                         response = MUD_GAME.addmon(shlex.join(args))
-                        writer.write(shlex.join(response).encode())
+                        answer = addmon_answer(*response)
                     case 'attack':
                         response = MUD_GAME.attack(my_player, shlex.join(args))
-                        writer.write(shlex.join(response).encode())
+                        answer = attack_answer(*response)
                     
                     # case ['yield', msg]:
                     #     if not my_id:
@@ -289,6 +312,7 @@ async def handler(reader, writer):
                     
                     case _:
                         continue
+                writer.write(answer.encode())
                     
 
             if request is receive:
