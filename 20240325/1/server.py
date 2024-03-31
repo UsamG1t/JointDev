@@ -6,6 +6,10 @@ import socket
 import sys
 import multiprocessing
 
+import asyncio
+
+Users = {}
+
 class Player:
     steps = {
     'up'   : {'x': 0, 'y':-1},
@@ -55,16 +59,15 @@ class Game:
     def __init__(self):
         self.field_size = 10
         self.monsters = {} # key(x, y) -> Monster()
-        self.player  = Player()
         
     def key(self, position):
         return position[1] * self.field_size + position[0]
     
-    def move(self, method, args):
+    def move(self, player, method, args):
         response = []
         print("LOG: ", 'move', method, args)
 
-        position = self.player.move(method, args)
+        position = player.move(method, args)
 
         response.append(str(position[0]))
         response.append(str(position[1]))
@@ -159,9 +162,9 @@ class Game:
         print("LOG: response", response)
         return response
 
-    def attack(self, args):
+    def attack(self, player, args):
         response = []
-        position = self.player.position()
+        position = player.position()
         key = self.key(position)
         args = shlex.split(args)
         print("LOG: ", 'attack', args)
@@ -170,6 +173,7 @@ class Game:
         or self.monsters[key].name != args[0]:
             response.append('1')
             return response
+        print("LOG: ", 'attack | after exist_check')
 
         name, dmg, hp = self.monsters[key].damage(int(args[1]))
         response.append('0')
@@ -182,36 +186,130 @@ class Game:
         print("LOG: response", response)
         return response
 
-def handler(conn, addr):
-    with conn:
-        print("LOG: ", 'Connected by', addr)
-        game = Game()
-        while data := conn.recv(1024).decode():
-            cmd, *args = shlex.split(data)
-            print("LOG: ", addr, data)
-            print("LOG: ", args)
-            match cmd:
-                case 'move':
-                    method, *args = args
-                    response = game.move(method, shlex.join(args))
-                    conn.sendall(shlex.join(response).encode())
-                case 'addmon':
-                    response = game.addmon(shlex.join(args))
-                    conn.sendall(shlex.join(response).encode())
-                case 'attack':
-                    response = game.attack(shlex.join(args))
-                    conn.sendall(shlex.join(response).encode())
-        print("LOG: client has left")
+# def handler(conn, addr):
+#     with conn:
+#         print("LOG: ", 'Connected by', addr)
+#         game = Game()
+#         while data := conn.recv(1024).decode():
+#             cmd, *args = shlex.split(data)
+#             print("LOG: ", addr, data)
+#             print("LOG: ", args)
+#             match cmd:
+#                 case 'move':
+#                     method, *args = args
+#                     response = game.move(method, shlex.join(args))
+#                     conn.sendall(shlex.join(response).encode())
+#                 case 'addmon':
+#                     response = game.addmon(shlex.join(args))
+#                     conn.sendall(shlex.join(response).encode())
+#                 case 'attack':
+#                     response = game.attack(shlex.join(args))
+#                     conn.sendall(shlex.join(response).encode())
+#         print("LOG: client has left")
         
-host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
-port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((host, port))
-    s.listen()
-    conn, addr = s.accept()
-    multiprocessing.Process(target=handler, args=(conn, addr)).start()
-    print("LOG: Server stop listening for new connections")
+# host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
+# port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#     s.bind((host, port))
+#     s.listen()
+#     conn, addr = s.accept()
+#     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+#     print("LOG: Server stop listening for new connections")
 
-    # while True:
-    #     conn, addr = s.accept()
-    #     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+#     # while True:
+#     #     conn, addr = s.accept()
+#     #     multiprocessing.Process(target=handler, args=(conn, addr)).start()
+
+# # ______________________________________________
+
+MUD_GAME = Game()
+users = dict()
+
+async def handler(reader, writer):
+    client = writer.get_extra_info("peername")
+    print(f'New Client on {client}')
+    my_id = None
+    my_player = None
+    my_queue = asyncio.Queue()
+    my_cmd = asyncio.create_task(reader.readline())
+    receive = asyncio.create_task(my_queue.get())
+
+    while not reader.at_eof():
+        done, pending = await asyncio.wait([my_cmd, receive], return_when=asyncio.FIRST_COMPLETED)
+
+        for request in done:
+            if request is my_cmd:
+                my_cmd = asyncio.create_task(reader.readline())
+                print(f'{client}: {request.result()}')
+                cmd, *args = shlex.split(request.result().decode())
+                print("LOG: ", client, request.result().decode())
+                print("LOG: ", args)
+                match cmd:
+                    case 'register':
+                        if args[0] in users.keys():
+                            writer.write('LoginError: Exists user with this id\n'.encode())
+                            done = None
+                            break
+
+                        writer.write(f'0:You are logged in with  id {args[0]}\n'.encode())
+                        my_id = args[0]
+                        my_player = Player()
+                        users[my_id] = my_queue
+                        print(f"{client} logs in as {my_id}\n")
+
+                    case 'move':
+                        method, *args = args
+                        response = MUD_GAME.move(my_player, method, shlex.join(args))
+                        writer.write(shlex.join(response).encode())
+                    case 'addmon':
+                        response = MUD_GAME.addmon(shlex.join(args))
+                        writer.write(shlex.join(response).encode())
+                    case 'attack':
+                        response = MUD_GAME.attack(my_player, shlex.join(args))
+                        writer.write(shlex.join(response).encode())
+                    
+                    # case ['yield', msg]:
+                    #     if not my_id:
+                    #         writer.write('NoAccessError: You are non-authorized client, please log in\n'.encode())
+                    #         break
+                        
+                    #     for user in users.values():
+                    #         if user is not my_queue:
+                    #             await user.put(f'{cowsay.cowsay(msg, cow=my_id)}')                    
+                    
+                    # case ['quit']:
+                    #     if not my_id:
+                    #         writer.write('NoAccessError: You are non-authorized client, please log in\n'.encode())
+                    #         break
+
+                    #     client = writer.get_extra_info("peername")
+                    #     print(f"{client} logs out from {my_id}\n")
+                    #     del users[my_id]
+                    #     my_id = None
+                    
+                    case _:
+                        continue
+                    
+
+            if request is receive:
+                receive = asyncio.create_task(my_queue.get())
+                writer.write(f"{request.result()}\n".encode())
+                await writer.drain()
+
+    my_cmd.cancel()
+    receive.cancel()
+    if my_id:
+        del users[my_id]
+    writer.close()
+    await writer.wait_closed()
+    print(f'{client} left')
+
+async def main():
+    print('Start working')
+    server = await asyncio.start_server(handler, '0.0.0.0', 1337)
+    print('activate server')
+    async with server:
+        print('Server Forever')
+        await server.serve_forever()
+
+asyncio.run(main())

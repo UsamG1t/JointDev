@@ -92,7 +92,7 @@ class  MUDcmd(cmd.Cmd):
     def do_up(self, args):
         'one step UP on field'
         
-        self.socket.sendall(f'move up'.encode())
+        self.socket.sendall(f'move up\n'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
         move_answer(*response)
@@ -100,7 +100,7 @@ class  MUDcmd(cmd.Cmd):
     def do_down(self, args):
         'one step DOWN on field'
         
-        self.socket.sendall(f'move down'.encode())
+        self.socket.sendall(f'move down\n'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
         move_answer(*response)
@@ -108,7 +108,7 @@ class  MUDcmd(cmd.Cmd):
     def do_left(self, args):
         'one step LEFT on field'
         
-        self.socket.sendall(f'move left'.encode())
+        self.socket.sendall(f'move left\n'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
         move_answer(*response)
@@ -116,7 +116,7 @@ class  MUDcmd(cmd.Cmd):
     def do_right(self, args):
         'one step RIGHT on field'
         
-        self.socket.sendall(f'move right'.encode())
+        self.socket.sendall(f'move right\n'.encode())
         response = self.socket.recv(1024).rstrip().decode()
         response = shlex.split(response)
         move_answer(*response)
@@ -194,7 +194,7 @@ class  MUDcmd(cmd.Cmd):
                         m_y = int(args[i+2])
                     case _: continue
         if not broken:
-            self.socket.sendall(f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"'.encode())
+            self.socket.sendall(f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"\n'.encode())
             response = self.socket.recv(1024).rstrip().decode()
             response = shlex.split(response)
             addmon_answer(*response)
@@ -220,7 +220,7 @@ class  MUDcmd(cmd.Cmd):
                 print('client: Invalid command')
 
         if weapon:
-            self.socket.sendall(f'attack {args[0]} {weapon["damage"]}'.encode())
+            self.socket.sendall(f'attack {args[0]} {weapon["damage"]}\n'.encode())
             response = self.socket.recv(1024).rstrip().decode()
             response = shlex.split(response)
             attack_answer(args[0], *response)
@@ -241,8 +241,16 @@ class  MUDcmd(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
-    port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
+    # host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
+    # port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
+    host = "localhost"
+    port = 1337
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((host, port))
-        MUDcmd(s).cmdloop()
+        s.sendall(f'register {sys.argv[1]}\n'.encode())
+        response = s.recv(1024).rstrip().decode()
+        if response[0] == '0':
+            print(response[2:])
+            MUDcmd(s).cmdloop()
+        else:
+            print(response)
