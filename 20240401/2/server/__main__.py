@@ -3,18 +3,7 @@ import shlex
 import cmd
 import asyncio
 
-addmon_errors = {
-    '1' : 'Invalid arguments (count of elements)',
-    '2' : 'Invalid arguments (type of name)', 
-    '3' : 'Cannot add unknown monster', 
-    '4' : 'Invalid arguments (type of message)', 
-    '5' : 'Invalid arguments (type of hp)', 
-    '6' : 'Invalid arguments (value of hp)', 
-    '7' : 'Invalid arguments (type of coord x', 
-    '8' : 'Invalid arguments (value of coord x)', 
-    '9' : 'Invalid arguments (type of coord y', 
-    '10': 'Invalid arguments (value of coord y)'
-}
+from common import *
 
 def move_answer(x, y, name=None, message=None):
     response = []
@@ -29,7 +18,14 @@ def move_answer(x, y, name=None, message=None):
     return '\n'.join(response)
 
 
-def addmon_answer(code, name = None, hp = None, x = None, y = None, msg = None, replace_check=None):
+def addmon_answer(
+        code, 
+        name = None,
+        hp = None,
+        x = None,
+        y = None,
+        msg = None,
+        replace_check=None):
     response = []
 
     if code != '0':
@@ -61,19 +57,6 @@ def attack_answer(name, code, dmg = None, hp = None):
 
 
 class Player:
-    steps = {
-    'up'   : {'x': 0, 'y':-1},
-    'down' : {'x': 0, 'y': 1},
-    'left' : {'x':-1, 'y': 0},
-    'right': {'x': 1, 'y': 0}
-    }
-
-    weapons = {
-    'sword': 10,
-    'spear': 15,
-    'axe'  : 20
-    }
-
     def __init__(self):
         self.x = self.y = 0
         self.field_size = 10
@@ -83,9 +66,9 @@ class Player:
 
     def move(self, method, args):
         self.x = (self.x + self.field_size
-                 + self.steps[method]['x']) % self.field_size
+                 + steps[method]['x']) % self.field_size
         self.y = (self.y + self.field_size
-                 + self.steps[method]['y']) % self.field_size
+                 + steps[method]['y']) % self.field_size
 
         return self.position()
 
@@ -208,7 +191,10 @@ class Game:
                 del self.monsters[key]
                 response.append("Replaced the old monster")
 
-            self.monsters[key] = Monster(monster['name'], monster['hp'], monster['message'])
+            self.monsters[key] = Monster(
+                                    monster['name'],
+                                    monster['hp'],
+                                    monster['message'])
 
         print("LOG: response", response)
         return response
@@ -250,7 +236,9 @@ async def handler(reader, writer):
     receive = asyncio.create_task(my_queue.get())
 
     while not reader.at_eof():
-        done, pending = await asyncio.wait([my_cmd, receive], return_when=asyncio.FIRST_COMPLETED)
+        done, pending = await asyncio.wait(
+            [my_cmd, receive],
+            return_when=asyncio.FIRST_COMPLETED)
 
         for request in done:
             if request is my_cmd:
@@ -266,11 +254,15 @@ async def handler(reader, writer):
                 match cmd:
                     case 'register':
                         if args[0] in users.keys():
-                            writer.write('LoginError: Exists user with this id\n'.encode())
+                            writer.write(
+                                'LoginError: Exists user with this id\n'
+                                .encode())
                             done = None
                             break
 
-                        writer.write(f'0:You are logged in with  id {args[0]}\n'.encode())
+                        writer.write(
+                            f'0:You are logged in with  id {args[0]}\n'
+                            .encode())
                         my_id = args[0]
                         my_player = Player()
                         users[my_id] = my_queue
@@ -306,7 +298,6 @@ async def handler(reader, writer):
                     case _:
                         continue
                 writer.write(answer.encode())
-                    
 
             if request is receive:
                 receive = asyncio.create_task(my_queue.get())
@@ -324,6 +315,7 @@ async def handler(reader, writer):
     writer.close()
     await writer.wait_closed()
     print(f'{client} left')
+
 
 async def main():
     print('Start working')

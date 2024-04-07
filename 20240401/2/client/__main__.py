@@ -9,16 +9,11 @@ import threading
 import sys
 import socket
 
+from common import *
+
 def msg_sendreciever(client, socket):
     while response := socket.recv(1024).rstrip().decode():
         print(f"\n{response}\n{client.prompt}{readline.get_line_buffer()}", end="", flush=True)
-
-
-weapons = {
-'sword': 10,
-'spear': 15,
-'axe'  : 20
-}
 
 custom_monster = cowsay.read_dot_cow(io.StringIO("""
 $the_cow = <<EOC;
