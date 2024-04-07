@@ -3,11 +3,6 @@ import shlex
 import cmd
 import asyncio
 
-# import socket
-# import sys
-# import multiprocessing
-
-
 addmon_errors = {
     '1' : 'Invalid arguments (count of elements)',
     '2' : 'Invalid arguments (type of name)', 
@@ -41,7 +36,6 @@ def addmon_answer(code, name = None, hp = None, x = None, y = None, msg = None, 
         response.append(addmon_errors[code])
         return '\n'.join(response)
 
-    # response.append(f'Added monster {name} with {hp} hp to ({x}, {y}) saying {msg}')
     response.append(f'Added monster {name} with {hp} hp')
     if replace_check:
         response.append(replace_check)
@@ -286,7 +280,6 @@ async def handler(reader, writer):
                             if user is not my_queue:
                                 await user.put(f'{my_id} join the MUD')                    
                     
-
                     case 'move':
                         method, *args = args
                         response = MUD_GAME.move(my_player, method, shlex.join(args))
@@ -305,16 +298,11 @@ async def handler(reader, writer):
                         for user in users.values():
                             if user is not my_queue:
                                 await user.put(f'{my_id} {answer}')
-                    # case ['quit']:
-                    #     if not my_id:
-                    #         writer.write('NoAccessError: You are non-authorized client, please log in\n'.encode())
-                    #         break
-
-                    #     client = writer.get_extra_info("peername")
-                    #     print(f"{client} logs out from {my_id}\n")
-                    #     del users[my_id]
-                    #     my_id = None
-                    
+                    case 'sayall':
+                        args = ' '.join(args)
+                        for user in users.values():
+                            if user is not my_queue:
+                                await user.put(f'{my_id}: {args}')
                     case _:
                         continue
                 writer.write(answer.encode())

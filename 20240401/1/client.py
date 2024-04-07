@@ -57,34 +57,22 @@ class  MUDcmd(cmd.Cmd):
         'one step UP on field'
         
         self.socket.sendall(f'move up\n'.encode())
-        # response = self.socket.recv(1024).rstrip().decode()
-        # response = shlex.split(response)
-        # move_answer(*response)
-    
+        
     def do_down(self, args):
         'one step DOWN on field'
         
         self.socket.sendall(f'move down\n'.encode())
-        # response = self.socket.recv(1024).rstrip().decode()
-        # response = shlex.split(response)
-        # move_answer(*response)
-    
+        
     def do_left(self, args):
         'one step LEFT on field'
         
         self.socket.sendall(f'move left\n'.encode())
-        # response = self.socket.recv(1024).rstrip().decode()
-        # response = shlex.split(response)
-        # move_answer(*response)
-    
+        
     def do_right(self, args):
         'one step RIGHT on field'
         
         self.socket.sendall(f'move right\n'.encode())
-        # response = self.socket.recv(1024).rstrip().decode()
-        # response = shlex.split(response)
-        # move_answer(*response)
-    
+        
     def do_addmon(self, args):
         '''
         Add monster on the position
@@ -159,10 +147,6 @@ class  MUDcmd(cmd.Cmd):
                     case _: continue
         if not broken:
             self.socket.sendall(f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"\n'.encode())
-            # response = self.socket.recv(1024).rstrip().decode()
-            # response = shlex.split(response)
-            # addmon_answer(*response)
-
 
     def do_attack(self, args):
         'Attack the monster in current position'
@@ -185,10 +169,6 @@ class  MUDcmd(cmd.Cmd):
 
         if weapon:
             self.socket.sendall(f'attack {args[0]} {weapon["damage"]}\n'.encode())
-            # response = self.socket.recv(1024).rstrip().decode()
-            # response = shlex.split(response)
-            # attack_answer(args[0], *response)
-
 
     def complete_attack(self, text, line, begidx, endidx):
         words = (line[:endidx] + ".").split()
@@ -201,14 +181,13 @@ class  MUDcmd(cmd.Cmd):
                     DICT = weapons.keys()
         return [c for c in DICT if c.startswith(text)]
 
-
+    def do_sayall(self, args):
+        self.socket.sendall(f'sayall {args}\n'.encode())
 
 
 if __name__ == '__main__':
-    # host = "localhost" if len(sys.argv) < 2 else sys.argv[1]
-    # port = 1337 if len(sys.argv) < 3 else int(sys.argv[2])
-    host = "localhost"
-    port = 1337
+    host = "localhost" if len(sys.argv) < 3 else sys.argv[2]
+    port = 1337 if len(sys.argv) < 4 else int(sys.argv[3])
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((host, port))
         s.sendall(f'register {sys.argv[1]}\n'.encode())
