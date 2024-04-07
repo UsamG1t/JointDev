@@ -2,7 +2,6 @@ import cmd
 import shlex
 
 import cowsay
-import io
 
 import readline
 import threading
@@ -11,27 +10,14 @@ import socket
 
 from common import *
 
+
 def msg_sendreciever(client, socket):
     while response := socket.recv(1024).rstrip().decode():
-        print(f"\n{response}\n{client.prompt}{readline.get_line_buffer()}", end="", flush=True)
+        print(f"\n{response}\n{client.prompt}{readline.get_line_buffer()}",
+              end="", flush=True)
 
-custom_monster = cowsay.read_dot_cow(io.StringIO("""
-$the_cow = <<EOC;
-         $thoughts
-          $thoughts
-    ,_                    _,
-    ) '-._  ,_    _,  _.-' (
-    )  _.-'.|\\--//|.'-._  (
-     )'   .'\/o\/o\/'.   `(
-      ) .' . \====/ . '. (
-       )  / <<    >> \  (
-        '-._/``  ``\_.-'
-  jgs     __\\'--'//__
-         (((""`  `"")))
-EOC
-"""))
 
-class  MUDcmd(cmd.Cmd):
+class MUDcmd(cmd.Cmd):
 
     def __init__(self, socket):
         self.field_size = 10
@@ -44,30 +30,31 @@ class  MUDcmd(cmd.Cmd):
     def do_EOF(self, args):
         'Stops game by ^D combination'
         return 1
+
     def emptyline(self):
         'auto-repeat of last command OFF'
         return
-    
+
     def do_up(self, args):
         'one step UP on field'
-        
-        self.socket.sendall(f'move up\n'.encode())
-        
+
+        self.socket.sendall('move up\n'.encode())
+
     def do_down(self, args):
         'one step DOWN on field'
-        
-        self.socket.sendall(f'move down\n'.encode())
-        
+
+        self.socket.sendall('move down\n'.encode())
+
     def do_left(self, args):
         'one step LEFT on field'
-        
-        self.socket.sendall(f'move left\n'.encode())
-        
+
+        self.socket.sendall('move left\n'.encode())
+
     def do_right(self, args):
         'one step RIGHT on field'
-        
-        self.socket.sendall(f'move right\n'.encode())
-        
+
+        self.socket.sendall('move right\n'.encode())
+
     def do_addmon(self, args):
         '''
         Add monster on the position
@@ -75,12 +62,12 @@ class  MUDcmd(cmd.Cmd):
         first argument is a name of monster from [cowsay.list_cows() | 'jgsbat']
 
         Other required args (their order is not important):
-        
+
         1. coord <int[0...field_size)> <int[0...field_size)>
         2. hp <int[0...inf)>
         3. hello <string (with quotation for more than one word)>
         '''
-        
+
         args = shlex.split(args)
         broken = False
 
@@ -103,61 +90,62 @@ class  MUDcmd(cmd.Cmd):
             for i in range(1, len(args)):
                 match args[i]:
                     case 'hello':
-                        if not isinstance(args[i+1], str):
+                        if not isinstance(args[i + 1], str):
                             broken = True
                             print('client: Invalid arguments (type of message)')
                             break
-                        monster["message"] = args[i+1]
+                        monster["message"] = args[i + 1]
                     case 'hp':
-                        if not args[i+1].isdigit():
+                        if not args[i + 1].isdigit():
                             broken = True
                             print('client: Invalid arguments (type of hp)')
                             break
-                        if int(args[i+1]) <= 0:
+                        if int(args[i + 1]) <= 0:
                             broken = True
                             print('client: Invalid arguments (value of hp)')
                             break
-                        monster["hp"] = int(args[i+1])
+                        monster["hp"] = int(args[i + 1])
                     case 'coord':
-                        if not args[i+1].isdigit():
+                        if not args[i + 1].isdigit():
                             broken = True
                             print('client: Invalid arguments (type of coord x')
                             break
-                        if int(args[i+1]) < 0 \
-                                or int(args[i+1]) >= self.field_size:
+                        if int(args[i + 1]) < 0 \
+                                or int(args[i + 1]) >= self.field_size:
                             broken = True
                             print('client: Invalid arguments (value of coord x)')
                             break
-                        if not args[i+2].isdigit():
+                        if not args[i + 2].isdigit():
                             broken = True
                             print('client: Invalid arguments (type of coord y')
                             break
-                        if int(args[i+2]) < 0 \
-                                or int(args[i+2]) >= self.field_size:
+                        if int(args[i + 2]) < 0 \
+                                or int(args[i + 2]) >= self.field_size:
                             broken = True
                             print('client: Invalid arguments (value of coord y)')
                             break
-                        m_x = int(args[i+1])
-                        m_y = int(args[i+2])
+                        m_x = int(args[i + 1])
+                        m_y = int(args[i + 2])
                     case _: continue
         if not broken:
-            self.socket.sendall(f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"\n'.encode())
+            self.socket.sendall(
+                f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"\n'.encode())
 
     def do_attack(self, args):
         'Attack the monster in current position'
 
         weapon = None
         args = shlex.split(args)
-        
+
         match args:
             case [name, 'with', weapon_type]:
                 if weapon_type not in weapons.keys():
                     print('client: Unknown weapon')
                 else:
-                    weapon = {'type'  : weapon_type,
+                    weapon = {'type': weapon_type,
                               'damage': weapons[weapon_type]}
             case [name]:
-                weapon = {'type'  : 'sword',
+                weapon = {'type': 'sword',
                           'damage': weapons['sword']}
             case _:
                 print('client: Invalid command')
@@ -190,7 +178,7 @@ if __name__ == '__main__':
         if response[0] == '0':
             print(response[2:])
             cli = MUDcmd(s)
-            request = threading.Thread(target = msg_sendreciever, args = (cli, cli.socket))
+            request = threading.Thread(target=msg_sendreciever, args=(cli, cli.socket))
             request.start()
             cli.cmdloop()
         else:

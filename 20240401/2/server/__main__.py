@@ -1,9 +1,9 @@
 import cowsay
 import shlex
-import cmd
 import asyncio
 
 from common import *
+
 
 def move_answer(x, y, name=None, message=None):
     response = []
@@ -18,14 +18,7 @@ def move_answer(x, y, name=None, message=None):
     return '\n'.join(response)
 
 
-def addmon_answer(
-        code, 
-        name = None,
-        hp = None,
-        x = None,
-        y = None,
-        msg = None,
-        replace_check=None):
+def addmon_answer(code, name=None, hp=None, replace_check=None):
     response = []
 
     if code != '0':
@@ -38,12 +31,13 @@ def addmon_answer(
 
     return '\n'.join(response)
 
-def attack_answer(name, code, dmg = None, hp = None):
+
+def attack_answer(name, code, dmg=None, hp=None):
     response = []
-    
+
     if code == '1':
         response.append(f'No {name} here')
-        return '\n'.join(response).encode()
+        return '\n'.join(response)
 
     response.append(f'Attacked {name}, damage {dmg} hp')
 
@@ -55,7 +49,6 @@ def attack_answer(name, code, dmg = None, hp = None):
     return '\n'.join(response)
 
 
-
 class Player:
     def __init__(self):
         self.x = self.y = 0
@@ -65,19 +58,20 @@ class Player:
         return (self.x, self.y)
 
     def move(self, method, args):
-        self.x = (self.x + self.field_size
-                 + steps[method]['x']) % self.field_size
-        self.y = (self.y + self.field_size
-                 + steps[method]['y']) % self.field_size
+        self.x = (self.x + self.field_size +
+                  steps[method]['x']) % self.field_size
+        self.y = (self.y + self.field_size +
+                  steps[method]['y']) % self.field_size
 
         return self.position()
+
 
 class Monster:
     def __init__(self, name, hp, message):
         self.name = name
         self.hp = hp
         self.message = message
-    
+
     def encounter(self):
         return (self.name, self.message)
 
@@ -87,15 +81,16 @@ class Monster:
 
         return (self.name, dmg, self.hp)
 
+
 class Game:
 
     def __init__(self):
         self.field_size = 10
-        self.monsters = {} # key(x, y) -> Monster()
-        
+        self.monsters = {}  # key(x, y) -> Monster()
+
     def key(self, position):
         return position[1] * self.field_size + position[0]
-    
+
     def move(self, player, method, args):
         response = []
         print("LOG: ", 'move', method, args)
@@ -106,7 +101,7 @@ class Game:
         response.append(str(position[1]))
 
         key = self.key(position)
-        if self.monsters.setdefault(key, None) != None:
+        if self.monsters.setdefault(key, None) is not None:
             result = self.monsters[key].encounter()
             response.append(result[0])
             response.append(result[1])
@@ -140,61 +135,57 @@ class Game:
             for i in range(1, len(args)):
                 match args[i]:
                     case 'hello':
-                        if not isinstance(args[i+1], str):
+                        if not isinstance(args[i + 1], str):
                             broken = True
                             response.append('4')
                             break
-                        monster["message"] = args[i+1]
+                        monster["message"] = args[i + 1]
                     case 'hp':
-                        if not args[i+1].isdigit():
+                        if not args[i + 1].isdigit():
                             broken = True
                             response.append('5')
                             break
-                        if int(args[i+1]) <= 0:
+                        if int(args[i + 1]) <= 0:
                             broken = True
                             response.append('6')
                             break
-                        monster["hp"] = int(args[i+1])
+                        monster["hp"] = int(args[i + 1])
                     case 'coord':
-                        if not args[i+1].isdigit():
+                        if not args[i + 1].isdigit():
                             broken = True
                             response.append('7')
                             break
-                        if int(args[i+1]) < 0 \
-                                or int(args[i+1]) >= self.field_size:
+                        if int(args[i + 1]) < 0 \
+                                or int(args[i + 1]) >= self.field_size:
                             broken = True
                             response.append('8')
                             break
-                        if not args[i+2].isdigit():
+                        if not args[i + 2].isdigit():
                             broken = True
                             response.append('9')
                             break
-                        if int(args[i+2]) < 0 \
-                                or int(args[i+2]) >= self.field_size:
+                        if int(args[i + 2]) < 0 \
+                                or int(args[i + 2]) >= self.field_size:
                             broken = True
                             response.append('10')
                             break
-                        m_x = int(args[i+1])
-                        m_y = int(args[i+2])
+                        m_x = int(args[i + 1])
+                        m_y = int(args[i + 2])
                     case _: continue
 
         if not broken:
             response.append('0')
             response.append(monster["name"])
             response.append(monster["hp"])
-            response.append(str(m_x))
-            response.append(str(m_y))
-            response.append(monster["message"])
-            
             key = self.key((m_x, m_y))
-            if self.monsters.setdefault(key, None) != None:
+            if self.monsters.setdefault(key, None) is not None:
                 del self.monsters[key]
                 response.append("Replaced the old monster")
 
             self.monsters[key] = Monster(
-                                    monster['name'],
-                                    monster['hp'],
-                                    monster['message'])
+                monster['name'],
+                monster['hp'],
+                monster['message'])
 
         print("LOG: response", response)
         return response
@@ -206,8 +197,9 @@ class Game:
         args = shlex.split(args)
         print("LOG: ", 'attack', args)
 
-        if self.monsters.setdefault(key, None) == None \
-        or self.monsters[key].name != args[0]:
+        if self.monsters.setdefault(key, None) is None \
+                or self.monsters[key].name != args[0]:
+            response.append(str(args[0]))
             response.append('1')
             return response
 
@@ -216,15 +208,17 @@ class Game:
         response.append('0')
         response.append(str(dmg))
         response.append(str(hp))
-        
+
         if not hp:
             del self.monsters[key]
 
         print("LOG: response", response)
         return response
 
+
 MUD_GAME = Game()
 users = dict()
+
 
 async def handler(reader, writer):
     client = writer.get_extra_info("peername")
@@ -245,7 +239,7 @@ async def handler(reader, writer):
                 my_cmd = asyncio.create_task(reader.readline())
                 print(f'{client}: {request.result()}')
                 if (not request.result()):
-                    break;
+                    break
 
                 cmd, *args = shlex.split(request.result().decode())
                 print("LOG: ", client, request.result().decode())
@@ -270,8 +264,8 @@ async def handler(reader, writer):
 
                         for user in users.values():
                             if user is not my_queue:
-                                await user.put(f'{my_id} join the MUD')                    
-                    
+                                await user.put(f'{my_id} join the MUD')
+
                     case 'move':
                         method, *args = args
                         response = MUD_GAME.move(my_player, method, shlex.join(args))
