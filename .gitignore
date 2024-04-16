@@ -1,3 +1,4 @@
 *.orig
 *.mo
 *.pot
+*__pycache__*
