@@ -2,3 +2,6 @@
 *.mo
 *.pot
 *__pycache__*
+build
+*.mood
+*.mo
