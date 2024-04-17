@@ -7,6 +7,7 @@ import readline
 import threading
 import sys
 import socket
+import time
 
 from common import *
 
@@ -19,13 +20,17 @@ def msg_sendreciever(client, socket):
 
 class MUDcmd(cmd.Cmd):
 
-    def __init__(self, socket):
+    def __init__(self, socket, stdin=None):
         self.field_size = 10
         self.socket = socket
         print("<<< Welcome to Python-MUD 0.1 >>>")
-        return super().__init__()
+        return super().__init__(stdin=stdin)
 
     prompt = ">> "
+
+    def precmd(self, line):
+        time.sleep(1)
+        return super().precmd(line)
 
     def do_EOF(self, args):
         'Stops game by ^D combination'
@@ -35,6 +40,9 @@ class MUDcmd(cmd.Cmd):
         'auto-repeat of last command OFF'
         return
 
+    def do_register(self, args):
+        self.socket.sendall(f'register {args}\n'.encode())
+        
     def do_up(self, args):
         'one step UP on field'
 
@@ -169,17 +177,27 @@ class MUDcmd(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    host = "localhost" if len(sys.argv) < 3 else sys.argv[2]
-    port = 1337 if len(sys.argv) < 4 else int(sys.argv[3])
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((host, port))
-        s.sendall(f'register {sys.argv[1]}\n'.encode())
-        response = s.recv(1024).rstrip().decode()
-        if response[0] == '0':
-            print(response[2:])
-            cli = MUDcmd(s)
-            request = threading.Thread(target=msg_sendreciever, args=(cli, cli.socket))
-            request.start()
-            cli.cmdloop()
-        else:
-            print(response)
+    if sys.argv[1] == '--file':
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(("localhost", 1337))
+    
+            with open(sys.argv[2]) as file:
+                scr = MUDcmd(s, stdin=file)
+                scr.prompt = ''
+                scr.use_rawinput = False
+                scr.cmdloop()
+    else:
+        host = "localhost" if len(sys.argv) < 3 else sys.argv[2]
+        port = 1337 if len(sys.argv) < 4 else int(sys.argv[3])
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((host, port))
+            s.sendall(f'register {sys.argv[1]}\n'.encode())
+            response = s.recv(1024).rstrip().decode()
+            if response[0] == '0':
+                print(response[2:])
+                cli = MUDcmd(s)
+                request = threading.Thread(target=msg_sendreciever, args=(cli, cli.socket))
+                request.start()
+                cli.cmdloop()
+            else:
+                print(response)
