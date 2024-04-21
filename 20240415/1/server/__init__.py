@@ -107,11 +107,13 @@ class Monster:
 
 class Game:
     '''Main game logic.'''
+    
 
     def __init__(self):
         '''Creating base data for game.'''
         self.field_size = 10
         self.monsters = {}  # key(x, y) -> Monster()
+        self.switch = "on"
 
     def key(self, position):
         '''Taking a key for monsters` map.'''
@@ -136,6 +138,18 @@ class Game:
             del self.monsters[key]
 
         print("LOG: response", response)
+        return response
+
+    def switcher(self, arg):
+        '''Processing of turning on|off the moving monsters setting.'''
+        print("LOG: ", 'switcher', arg)
+
+        if arg in ['on','off']:
+            self.switch = arg
+            response = 'Moving monsters: {}'.format(arg)
+        else:
+            response = 'Invalid argument'
+
         return response
 
     def addmon(self, args):
@@ -304,6 +318,10 @@ async def handler(reader, writer):
                         method, *args = args
                         response = MUD_GAME.move(my_player, method, shlex.join(args))
                         answer = move_answer(*response)
+                    
+                    case 'movemonsters':
+                        answer = MUD_GAME.switcher(args[0])
+
                     case 'addmon':
                         response = MUD_GAME.addmon(shlex.join(args))
                         answer = addmon_answer(*response)
@@ -348,7 +366,8 @@ async def handler(reader, writer):
 async def move_monsters():
     while True:
         print("New Loop")
-        if 0 < len(MUD_GAME.monsters) < MUD_GAME.field_size**2:
+        print(f"switch {MUD_GAME.switch}")
+        if MUD_GAME.switch == "on" and 0 < len(MUD_GAME.monsters) < MUD_GAME.field_size**2:
             print("Try")
             found = False
             while not found:

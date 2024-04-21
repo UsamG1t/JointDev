@@ -45,6 +45,11 @@ class MUDcmd(cmd.Cmd):
 
         self.socket.sendall(f'register {args}\n'.encode())
 
+    def do_movemonsters(self, args):
+        'swither of moving monsters setting'
+
+        self.socket.sendall(f'movemonsters {args}\n'.encode())
+
     def do_up(self, args):
         'one step UP on field'
 
