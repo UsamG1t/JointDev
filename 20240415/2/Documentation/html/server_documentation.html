@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Server Documentation &#8212; MMUD  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to MMUD’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-server">
+<span id="server-documentation"></span><h1>Server Documentation<a class="headerlink" href="#module-server" title="Link to this heading">¶</a></h1>
+<p>Main logic of server program</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Game">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Game</span></span><a class="headerlink" href="#server.Game" title="Link to this definition">¶</a></dt>
+<dd><p>Main game logic.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Game.addmon">
+<span class="sig-name descname"><span class="pre">addmon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Game.addmon" title="Link to this definition">¶</a></dt>
+<dd><p>Processing of addmon request from client.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Game.attack">
+<span class="sig-name descname"><span class="pre">attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Game.attack" title="Link to this definition">¶</a></dt>
+<dd><p>Processing of attack request from client.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Game.key">
+<span class="sig-name descname"><span class="pre">key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Game.key" title="Link to this definition">¶</a></dt>
+<dd><p>Taking a key for monsters` map.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Game.move">
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Game.move" title="Link to this definition">¶</a></dt>
+<dd><p>Processing of move request from client.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Monster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Monster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Monster" title="Link to this definition">¶</a></dt>
+<dd><p>Main actions of Player.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Monster.damage">
+<span class="sig-name descname"><span class="pre">damage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">damage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Monster.damage" title="Link to this definition">¶</a></dt>
+<dd><p>return response for “attack_answer”.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Monster.encounter">
+<span class="sig-name descname"><span class="pre">encounter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.Monster.encounter" title="Link to this definition">¶</a></dt>
+<dd><p>return response for “move_answer”.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Player">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Player</span></span><a class="headerlink" href="#server.Player" title="Link to this definition">¶</a></dt>
+<dd><p>Main actions of Player.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Player.move">
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.Player.move" title="Link to this definition">¶</a></dt>
+<dd><p>do one step with direction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Player.position">
+<span class="sig-name descname"><span class="pre">position</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.Player.position" title="Link to this definition">¶</a></dt>
+<dd><p>return coordinates of player.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.addmon_answer">
+<span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">addmon_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.addmon_answer" title="Link to this definition">¶</a></dt>
+<dd><p>Preprocessing of addmon response.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.attack_answer">
+<span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">attack_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.attack_answer" title="Link to this definition">¶</a></dt>
+<dd><p>Preprocessing of attack response.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.encounter_answer">
+<span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">encounter_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.encounter_answer" title="Link to this definition">¶</a></dt>
+<dd><p>Preprocessing of encounter response.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.handler">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.handler" title="Link to this definition">¶</a></dt>
+<dd><p>Main async-handler logic.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.main">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.main" title="Link to this definition">¶</a></dt>
+<dd><p>Main async-server logic.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.move_answer">
+<span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">move_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.move_answer" title="Link to this definition">¶</a></dt>
+<dd><p>Preprocessing of move response.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">MMUD</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Server Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#server.Game"><code class="docutils literal notranslate"><span class="pre">Game</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.Monster"><code class="docutils literal notranslate"><span class="pre">Monster</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.Player"><code class="docutils literal notranslate"><span class="pre">Player</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.addmon_answer"><code class="docutils literal notranslate"><span class="pre">addmon_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.attack_answer"><code class="docutils literal notranslate"><span class="pre">attack_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.encounter_answer"><code class="docutils literal notranslate"><span class="pre">encounter_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.handler"><code class="docutils literal notranslate"><span class="pre">handler()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server.move_answer"><code class="docutils literal notranslate"><span class="pre">move_answer()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to MMUD’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, UsamUNX.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/server_documentation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
