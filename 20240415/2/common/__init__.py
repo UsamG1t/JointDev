@@ -1,6 +1,11 @@
 import cowsay
+import gettext
 import io
 
+LOCALES = {
+    ("ru_RU", "UTF-8"): gettext.translation("MMUD_Locale", "po", ["ru_RU.UTF-8"]),
+    ("en_US", "UTF-8"): gettext.NullTranslations(),
+}
 
 addmon_errors = {
     '1' : 'Invalid arguments (count of elements)',

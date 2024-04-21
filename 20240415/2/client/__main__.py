@@ -50,6 +50,11 @@ class MUDcmd(cmd.Cmd):
 
         self.socket.sendall(f'movemonsters {args}\n'.encode())
 
+    def do_locale(self, locale):
+        'swither of locale setting'
+
+        self.socket.sendall(f'locale {locale}\n'.encode())
+
     def do_up(self, args):
         'one step UP on field'
 

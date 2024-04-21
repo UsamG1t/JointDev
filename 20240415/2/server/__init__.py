@@ -29,7 +29,7 @@ def encounter_answer(name, message):
     return cowsay.cowsay(message, cow=name)
 
 
-def addmon_answer(code, name=None, hp=None, replace_check=None):
+def addmon_answer(locale, code, name=None, hp=None, replace_check=None):
     '''Preprocessing of addmon response.'''
     response = []
 
@@ -37,29 +37,46 @@ def addmon_answer(code, name=None, hp=None, replace_check=None):
         response.append(addmon_errors[code])
         return '\n'.join(response)
 
-    response.append(f'Added monster {name} with {hp} hp')
+    response.append(ngettext(locale,
+                             'Added monster {} with {} hp',
+                             'Added monster {} with {} hp',
+                             hp).format(name, hp))
     if replace_check:
-        response.append(replace_check)
+        response.append(gettext(locale, replace_check))
 
     return '\n'.join(response)
 
 
-def attack_answer(name, code, dmg=None, hp=None):
+def attack_answer(locale, name, code, dmg=None, hp=None):
     '''Preprocessing of attack response.'''
     response = []
 
     if code == '1':
-        response.append(f'No {name} here')
+        response.append(gettext(locale, 'No {} here').format(name))
         return '\n'.join(response)
 
-    response.append(f'Attacked {name}, damage {dmg} hp')
+    response.append(ngettext(locale,
+                             'Attacked {}, damage {} hp',
+                             'Attacked {}, damage {} hp',
+                             hp).format(name, hp))
 
     if hp != '0':
-        response.append(f'{name} now has {hp}')
+        response.append(ngettext(locale,
+                                 '{} now has {}',
+                                 '{} now has {}',
+                                 hp).format(name, hp))
     else:
-        response.append(f'{name} died')
+        response.append(gettext(locale, '{} died').format(name))
 
     return '\n'.join(response)
+
+
+def ngettext(locale, *text):
+    return LOCALES[locale].ngettext(*text)
+
+
+def gettext(locale, *text):
+    return LOCALES[locale].gettext(*text)
 
 
 class Player:
@@ -69,6 +86,7 @@ class Player:
         '''Creating base data for player.'''
         self.x = self.y = 0
         self.field_size = 10
+        self.locale = ("en_US", "UTF-8")
 
     def position(self):
         '''return coordinates of player.'''
@@ -107,7 +125,6 @@ class Monster:
 
 class Game:
     '''Main game logic.'''
-    
 
     def __init__(self):
         '''Creating base data for game.'''
@@ -144,13 +161,23 @@ class Game:
         '''Processing of turning on|off the moving monsters setting.'''
         print("LOG: ", 'switcher', arg)
 
-        if arg in ['on','off']:
+        if arg in ['on', 'off']:
             self.switch = arg
             response = 'Moving monsters: {}'.format(arg)
         else:
             response = 'Invalid argument'
 
         return response
+
+    def locale(self, player, locale):
+        '''Processing of changing the locale setting.'''
+        response = []
+        print("LOG: ", 'locale', locale)
+
+        player.locale = locale
+        response.append(gettext(locale, 'Set up locale: {}').format('.'.join(locale)))
+
+        return '\n'.join(response)
 
     def addmon(self, args):
         '''Processing of addmon request from client.'''
@@ -249,10 +276,10 @@ class Game:
             return response
 
         name, dmg, hp = self.monsters[key].damage(int(args[1]))
-        response.append(str(name))
+        response.append(name)
         response.append('0')
-        response.append(str(dmg))
-        response.append(str(hp))
+        response.append(dmg)
+        response.append(hp)
 
         if not hp:
             del self.monsters[key]
@@ -310,32 +337,40 @@ async def handler(reader, writer):
                         users[my_id] = my_queue
                         print(f"{client} logs in as {my_id}\n")
 
-                        for user in users.values():
-                            if user is not my_queue:
-                                await user.put(f'{my_id} join the MUD')
+                        for user, user_queue in users.items():
+                            if user_queue is not my_queue:
+                                await user_queue.put(gettext(users_info[user].locale,
+                                                             '{} join the MUD').format(my_id))
 
                     case 'move':
                         method, *args = args
                         response = MUD_GAME.move(my_player, method, shlex.join(args))
                         answer = move_answer(*response)
-                    
+
                     case 'movemonsters':
                         answer = MUD_GAME.switcher(args[0])
 
+                    case 'locale':
+                        answer = MUD_GAME.locale(my_player, tuple(args[0].split('.')))
+
                     case 'addmon':
                         response = MUD_GAME.addmon(shlex.join(args))
-                        answer = addmon_answer(*response)
 
-                        for user in users.values():
-                            if user is not my_queue:
-                                await user.put(f'{my_id} {answer}')
+                        for user, user_queue in users.items():
+                            if user_queue is not my_queue:
+                                answer = addmon_answer(users_info[user].locale, *response)
+                                await user_queue.put(f'{my_id} {answer}')
+                        
+                        answer = addmon_answer(my_player.locale, *response)
                     case 'attack':
                         response = MUD_GAME.attack(my_player, shlex.join(args))
-                        answer = attack_answer(*response)
 
-                        for user in users.values():
-                            if user is not my_queue:
-                                await user.put(f'{my_id} {answer}')
+                        for user, user_queue in users.items():
+                            if user_queue is not my_queue:
+                                answer = attack_answer(users_info[user].locale, *response)
+                                await user_queue.put(f'{my_id} {answer}')
+                        
+                        answer = attack_answer(my_player.locale, *response)
                     case 'sayall':
                         args = ' '.join(args)
                         for user in users.values():
@@ -343,6 +378,7 @@ async def handler(reader, writer):
                                 await user.put(f'{my_id}: {args}')
                     case _:
                         continue
+                print(f"~~~{answer}~~~")
                 writer.write(answer.encode())
 
             if request is receive:
@@ -350,9 +386,10 @@ async def handler(reader, writer):
                 writer.write(f"{request.result()}\n".encode())
                 await writer.drain()
 
-    for user in users.values():
-        if user is not my_queue:
-            await user.put(f'{my_id} left the MUD')
+    for user, user_queue in users.items():
+        if user_queue is not my_queue:
+            await user_queue.put(gettext(users_info[user].locale,
+                                         '{} left the MUD').format(my_id))
 
     my_cmd.cancel()
     receive.cancel()
@@ -367,7 +404,8 @@ async def move_monsters():
     while True:
         print("New Loop")
         print(f"switch {MUD_GAME.switch}")
-        if MUD_GAME.switch == "on" and 0 < len(MUD_GAME.monsters) < MUD_GAME.field_size**2:
+        if (MUD_GAME.switch == "on" and
+                0 < len(MUD_GAME.monsters) < MUD_GAME.field_size**2):
             print("Try")
             found = False
             while not found:
