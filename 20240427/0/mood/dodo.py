@@ -1,6 +1,7 @@
 from zipfile import ZipFile
 from pathlib import Path
-from glob import iglob
+from glob import iglob, glob
+from doit.tools import create_folder
 
 ZIPARCH = 'arch.zip'
 HTMLINDEX = "Documentation/_build/html/index.html"
@@ -39,7 +40,7 @@ def task_pot():
     """Re-create .pot ."""
     return {
             'actions': ['pybabel extract -o MMUD.pot .'],
-            'file_dep': glob.glob('*.py'),
+            'file_dep': [*iglob('*.py')],
             'targets': ['MMUD.pot'],
            }
 
