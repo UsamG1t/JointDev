@@ -447,13 +447,16 @@ async def move_monsters():
         await asyncio.sleep(30)
 
 
-async def main():
+async def main(port = 1337):
     '''Main async-server logic.'''
     print('Start working')
-    server = await asyncio.start_server(handler, '0.0.0.0', 1337)
+    server = await asyncio.start_server(handler, '0.0.0.0', port)
     print('activate server')
     move_operator = asyncio.create_task(move_monsters())
     await asyncio.sleep(0)
     async with server:
         print('Server Forever')
         await server.serve_forever()
+
+def start(port = 1337):
+    asyncio.run(main(port))

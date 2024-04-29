@@ -1,5 +1,5 @@
 """Start server."""
-from . import main
+from . import start
 import asyncio
 
-asyncio.run(main())
+start()
