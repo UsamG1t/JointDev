@@ -58,12 +58,12 @@ def attack_answer(locale, name, code, dmg=None, hp=None):
     response.append(ngettext(locale,
                              'Attacked {}, damage {} hp',
                              'Attacked {}, damage {} hp',
-                             hp).format(name, hp))
+                             hp).format(name, dmg))
 
     if hp != '0':
         response.append(ngettext(locale,
-                                 '{} now has {}',
-                                 '{} now has {}',
+                                 '{} now has {} hp',
+                                 '{} now has {} hp',
                                  hp).format(name, hp))
     else:
         response.append(gettext(locale, '{} died').format(name))

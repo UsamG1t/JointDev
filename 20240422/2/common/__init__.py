@@ -14,7 +14,7 @@ addmon_errors = {
     '4' : 'Invalid arguments (type of message)',
     '5' : 'Invalid arguments (type of hp)',
     '6' : 'Invalid arguments (value of hp)',
-    '7' : 'Invalid arguments (type of coord x',
+    '7' : 'Invalid arguments (type of coord x)',
     '8' : 'Invalid arguments (value of coord x)',
     '9' : 'Invalid arguments (type of coord y',
     '10': 'Invalid arguments (value of coord y)'
@@ -26,6 +26,8 @@ steps = {
     'left' : {'x':-1, 'y': 0},
     'right': {'x': 1, 'y': 0}
 }
+
+field_size = 10
 
 weapons = {
     'sword': 10,
