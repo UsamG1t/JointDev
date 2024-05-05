@@ -1,5 +1,4 @@
-from zipfile import ZipFile
-from pathlib import Path
+
 from glob import iglob, glob
 from doit.tools import create_folder
 
