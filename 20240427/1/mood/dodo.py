@@ -2,14 +2,13 @@
 from glob import iglob, glob
 from doit.tools import create_folder
 
-ZIPARCH = 'arch.zip'
-HTMLINDEX = "Documentation/_build/html/index.html"
+HTMLINDEX = "_build/html/index.html"
 
 def task_html():
     """Generate HTML docs."""
     return {
-        'actions': ['sphinx-build -M html "Documentation" "_build"'],
-        'file_dep': ["Documentation/index.rst", "Documentation/server_documentation.rst", "server/__init__.py"],
+        'actions': ['sphinx-build -M html "." "_build"'],
+        'file_dep': ["index.rst", "server_documentation.rst", "server/__init__.py", "po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo"],
         'targets': [HTMLINDEX]
     }
 
