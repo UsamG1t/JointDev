@@ -1,4 +1,4 @@
-'''Main logic of the server program'''
+'''Main logic of server program'''
 import cowsay
 import shlex
 import asyncio
