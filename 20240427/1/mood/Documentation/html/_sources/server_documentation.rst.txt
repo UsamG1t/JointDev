@@ -2,6 +2,6 @@ Server Documentation
 ====================
 
 
-.. automodule:: server
+.. automodule:: ...server
    :members:
    :private-members:
