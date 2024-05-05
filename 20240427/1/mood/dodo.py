@@ -35,7 +35,7 @@ def task_po():
             'targets': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
            }
 
-def task_mo():
+def task_il8n():
     """Compile translations."""
     return {
             'actions': [
@@ -46,3 +46,9 @@ def task_mo():
             'targets': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo'],
            }
 
+def task_test():
+    """Update translations."""
+    return {
+            'actions': ['python3.10 -m unittest test_client_server.py'],
+            'file_dep': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo'],
+           }
