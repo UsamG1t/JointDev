@@ -8,7 +8,7 @@ def task_html():
     """Generate HTML docs."""
     return {
         'actions': ['sphinx-build -M html "." "_build"'],
-        'file_dep': ["index.rst", "server_documentation.rst", "server/__init__.py", "po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo"],
+        'file_dep': ["index.rst", "server_documentation.rst", "mood/server/__init__.py", "po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo"],
         'targets': [HTMLINDEX]
     }
 

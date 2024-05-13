@@ -1,5 +1,5 @@
 [project]
-name = "UsamMMUD"
+name = "mood"
 description = "MMUD terminal game"
 dynamic = ["version"]
 
@@ -8,7 +8,7 @@ requires = ["Sphinx", "build", "doit", "python-cowsay", "setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
-version = {attr = "UsamMMUD.VERSION"}
+version = {attr = "mood.VERSION"}
 
 [tool.setuptools.package-dir]
-UsamMMUD = "UsamMMUD"
+mood = "mood"
