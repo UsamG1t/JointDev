@@ -1,6 +1,4 @@
-graft server
-graft client
-graft common
+graft mood
 include pyproject.toml
 recursive-include po *.po
 include MMUD.pot
