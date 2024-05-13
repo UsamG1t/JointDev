@@ -2,6 +2,6 @@ Server Documentation
 ====================
 
 
-.. automodule:: server
+.. automodule:: mood.server
    :members:
    :private-members:
