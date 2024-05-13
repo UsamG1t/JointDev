@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 version = {attr = "mood.VERSION"}
 
 [tool.setuptools.package-dir]
-mood = "mood"
+mood = ""
 
 [tool.setuptools.package-data]
 mood = ["po/*/*/*.mo"]
