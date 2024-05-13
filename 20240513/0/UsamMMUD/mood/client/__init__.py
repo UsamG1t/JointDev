@@ -8,7 +8,7 @@ import sys
 import socket
 import time
 
-from common import *
+from ..common import *
 
 
 def msg_sendreciever(client, socket):

@@ -60,7 +60,7 @@ def task_sdist():
             'task_dep': ['erase'],
            }
 
-def task_sdist():
+def task_wheel():
     """Build binary wheel."""
     return {
             'actions': ['python3.10 -m build -n -w'],

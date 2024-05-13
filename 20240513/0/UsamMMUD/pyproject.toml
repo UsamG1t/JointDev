@@ -12,3 +12,6 @@ version = {attr = "mood.VERSION"}
 
 [tool.setuptools.package-dir]
 mood = "mood"
+
+[tool.setuptools.package-data]
+mood = ["po/*/*/*.mo"]
