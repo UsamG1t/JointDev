@@ -1,0 +1,14 @@
+[project]
+name = "UsamMMUD"
+description = "MMUD terminal game"
+dynamic = ["version"]
+
+[build-system]
+requires = ["Sphinx", "build", "doit", "python-cowsay", "setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "UsamMMUD.VERSION"}
+
+[tool.setuptools.package-dir]
+UsamMMUD = "UsamMMUD"
