@@ -1,0 +1,20 @@
+[project]
+name = "UsamMMUD"
+description = "MMUD terminal game"
+readme = "README.md"
+license = {text = "MIT-0"}
+authors = [
+ {name = "Stephen", email = ""}
+]
+dynamic = ["version"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "UsamMMUD.VERSION"}
+
+[tool.setuptools.package-dir]
+UsamMMUD = "UsamMMUD"
+

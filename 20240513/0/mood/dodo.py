@@ -52,3 +52,10 @@ def task_test():
             'actions': ['python3.10 -m unittest test_client_server.py'],
             'file_dep': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo'],
            }
+
+def task_sdist():
+    """Build distributive."""
+    return {
+            'actions': ['python3.10 -m build --sdist'],
+            'file_dep': ['gitclean'],
+           }
