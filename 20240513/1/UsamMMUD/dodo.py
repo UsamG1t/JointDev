@@ -22,7 +22,7 @@ def task_erase():
 def task_pot():
     """Re-create .pot ."""
     return {
-            'actions': ['pybabel extract -o MMUD.pot .'],
+            'actions': ['pybabel extract --keywords=ngettext:2,3 --keywords=gettext:2 mood -o MMUD.pot'],
             'file_dep': glob('mood/server/*.py'),
             'targets': ['MMUD.pot'],
            }
@@ -35,7 +35,7 @@ def task_po():
             'targets': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
            }
 
-def task_il8n():
+def task_i18n():
     """Compile translations."""
     return {
             'actions': [
@@ -64,5 +64,5 @@ def task_wheel():
     """Build binary wheel."""
     return {
             'actions': ['python3.10 -m build -n -w'],
-            'task_dep': ['il8n'],
+            'task_dep': ['i18n'],
            }
