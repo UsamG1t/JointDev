@@ -1,0 +1,12 @@
+[project]
+name = "mood"
+description = "MMUD terminal game"
+version = "0.0.1"
+
+[build-system]
+requires = ["Sphinx", "build", "doit", "python-cowsay", "setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-dir]
+mood = "mood"
+
