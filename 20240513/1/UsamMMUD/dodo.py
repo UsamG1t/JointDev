@@ -1,5 +1,5 @@
 
-from glob import iglob, glob
+from glob import glob
 from doit.tools import create_folder
 
 HTMLINDEX = "_build/html/index.html"
@@ -23,7 +23,7 @@ def task_pot():
     """Re-create .pot ."""
     return {
             'actions': ['pybabel extract -o MMUD.pot .'],
-            'file_dep': [*iglob('*.py')],
+            'file_dep': glob('mood/server/*.py'),
             'targets': ['MMUD.pot'],
            }
 

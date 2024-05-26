@@ -5,7 +5,7 @@ import asyncio
 import random
 from copy import copy
 
-from ..common import *
+from common import *
 
 
 def move_answer(x, y, name=None, message=None):
