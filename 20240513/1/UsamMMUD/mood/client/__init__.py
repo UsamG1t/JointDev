@@ -8,6 +8,8 @@ import sys
 import socket
 import time
 
+import webbrowser
+
 from ..common import *
 
 
@@ -38,6 +40,11 @@ class MUDcmd(cmd.Cmd):
     def emptyline(self):
         'auto-repeat of last command OFF'
         return
+
+    def do_documentation(self):
+        'Open documentation for user'
+
+        webbrowser.open("../../_build/html/index.html")
 
     def do_register(self, args):
         'Script registration'
