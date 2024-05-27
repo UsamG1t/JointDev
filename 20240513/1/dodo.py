@@ -51,7 +51,7 @@ def task_test():
     """Update translations."""
     return {
             'actions': ['python3.10 -m unittest test_client_server.py'],
-            'file_dep': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo'],
+            'task_dep': ['i18n'],
            }
 
 def task_sdist():
@@ -64,6 +64,6 @@ def task_sdist():
 def task_wheel():
     """Build binary wheel."""
     return {
-            'actions': ['python3.10 -m build -n -w'],
+            'actions': ['python3.10 -m build -w'],
             'task_dep': ['i18n'],
            }
