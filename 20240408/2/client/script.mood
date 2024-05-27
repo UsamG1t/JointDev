@@ -1,0 +1,9 @@
+register scr1
+up
+down
+addmon milk coord 0 0 hello u hp 17
+left
+right
+attack milk with axe
+attack milk with axe
+attack milk with axe

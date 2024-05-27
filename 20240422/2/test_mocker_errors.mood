@@ -1,0 +1,3 @@
+addmon t coord 0 0 hello U hp 19
+addmon milk coord 110 0 hello U hp 19
+addmon milk coord 0 0 hello U hp qwerty

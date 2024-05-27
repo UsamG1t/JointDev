@@ -11,7 +11,6 @@ import webbrowser
 
 from ..common import *
 
-
 def msg_sendreciever(client, socket):
     """Thread-based handler for recieving msges."""
     while response := socket.recv(1024).rstrip().decode():

@@ -1,0 +1,7 @@
+register sch1
+movemonsters off
+addmon milk coord 2 2 hp 19 hello Hi
+right
+right
+down
+down

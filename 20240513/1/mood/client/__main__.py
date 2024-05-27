@@ -12,11 +12,13 @@ def client():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect(("localhost", 1337))
 
-        with open(sys.argv[2]) as file:
-            scr = MUDcmd(s, stdin=file)
-            scr.prompt = ''
-            scr.use_rawinput = False
-            scr.cmdloop()
+            with open(sys.argv[2]) as file:
+                scr = MUDcmd(s, stdin=file)
+                scr.prompt = ''
+                scr.use_rawinput = False
+                request = threading.Thread(target=msg_sendreciever, args=(scr, scr.socket))
+                request.start()
+                scr.cmdloop()
     else:
         host = "localhost" if len(sys.argv) < 3 else sys.argv[2]
         port = 1337 if len(sys.argv) < 4 else int(sys.argv[3])
