@@ -7,7 +7,7 @@ HTMLINDEX = "_build/html/index.html"
 def task_html():
     """Generate HTML docs."""
     return {
-        'actions': ['sphinx-build -M html "Documentation/docs" "_build"'],
+        'actions': ['sphinx-build -M html "Documentation/docs" "mood/_build"'],
         'file_dep': ["Documentation/docs/index.rst", "Documentation/docs/server_documentation.rst", "mood/server/__init__.py"],
         'task_dep': ['i18n'],
         'targets': [HTMLINDEX]
