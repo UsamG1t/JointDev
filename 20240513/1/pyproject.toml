@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 mood = "mood"
 
 [tool.setuptools.package-data]
-mood = ["mood/po/*/*/*.mo", "mood/_build/*"]
+mood = ["mood/po/*", "mood/_build/*", "mood/server/*", "mood/client/*", "mood/common/*", "mood/MMUD.pot", ]
 
 [project.scripts]
 client = "mood.client.__main__:client"
