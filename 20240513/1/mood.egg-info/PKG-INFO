@@ -1,5 +1,0 @@
-Metadata-Version: 2.1
-Name: mood
-Version: 0.0.1
-Summary: MMUD terminal game
-Requires-Dist: python-cowsay
