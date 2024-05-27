@@ -4,12 +4,14 @@ import shlex
 import asyncio
 import random
 import gettext
+from pathlib import Path
 from copy import copy
 
 from ..common import *
 
+
 LOCALES = {
-    ("ru_RU", "UTF-8"): gettext.translation("MMUD_Locale", "mood/po", ["ru_RU.UTF-8"]),
+    ("ru_RU", "UTF-8"): gettext.translation("MMUD_Locale", str(Path(__file__).parents[1])+"/po", ["ru_RU.UTF-8"]),
     ("en_US", "UTF-8"): gettext.NullTranslations(),
 }
 
