@@ -1,3 +1,4 @@
+"""Common additions of program."""
 import cowsay
 import io
 

@@ -1,4 +1,4 @@
-'''Main logic of server program'''
+"""Main logic of server program."""
 import cowsay
 import shlex
 import asyncio
@@ -20,7 +20,7 @@ LOCALES = {
 
 
 def move_answer(x, y, name=None, message=None):
-    '''Preprocessing of move response.'''
+    """Preprocessing of move response."""
     response = []
     response.append(f'Moved to ({x}, {y})')
 
@@ -34,14 +34,14 @@ def move_answer(x, y, name=None, message=None):
 
 
 def encounter_answer(name, message):
-    '''Preprocessing of encounter response.'''
+    """Preprocessing of encounter response."""
     if name == 'jgsbat':
         return cowsay.cowsay(message, cowfile=custom_monster)
     return cowsay.cowsay(message, cow=name)
 
 
 def addmon_answer(locale, code, name=None, hp=None, replace_check=None):
-    '''Preprocessing of addmon response.'''
+    """Preprocessing of addmon response."""
     response = []
 
     if code != '0':
@@ -59,7 +59,7 @@ def addmon_answer(locale, code, name=None, hp=None, replace_check=None):
 
 
 def attack_answer(locale, name, code, dmg=None, hp=None):
-    '''Preprocessing of attack response.'''
+    """Preprocessing of attack response."""
     response = []
 
     if code == '1':
@@ -83,28 +83,30 @@ def attack_answer(locale, name, code, dmg=None, hp=None):
 
 
 def ngettext(locale, *text):
+    """Translate function for multiple items."""
     return LOCALES[locale].ngettext(*text)
 
 
 def gettext(locale, *text):
+    """Translate function for unique items."""
     return LOCALES[locale].gettext(*text)
 
 
 class Player:
-    '''Main actions of Player.'''
+    """Main actions of Player."""
 
     def __init__(self):
-        '''Creating base data for player.'''
+        """Create base data for player."""
         self.x = self.y = 0
         self.field_size = 10
         self.locale = ("en_US", "UTF-8")
 
     def position(self):
-        '''return coordinates of player.'''
+        """Return coordinates of player."""
         return (self.x, self.y)
 
     def move(self, method, args):
-        '''do one step with direction.'''
+        """Do one step with direction."""
         self.x = (self.x + self.field_size +
                   steps[method]['x']) % self.field_size
         self.y = (self.y + self.field_size +
@@ -114,20 +116,20 @@ class Player:
 
 
 class Monster:
-    '''Main actions of Player.'''
+    """Main actions of Player."""
 
     def __init__(self, name, hp, message):
-        '''Creating base data for monster.'''
+        """Create base data for monster."""
         self.name = name
         self.hp = hp
         self.message = message
 
     def encounter(self):
-        '''return response for \"move_answer\".'''
+        r"""Return response for \"move_answer\"."""
         return (self.name, self.message)
 
     def damage(self, damage):
-        '''return response for \"attack_answer\".'''
+        r"""Return response for \"attack_answer\"."""
         dmg = min([self.hp, damage])
         self.hp = self.hp - dmg
 
@@ -135,20 +137,20 @@ class Monster:
 
 
 class Game:
-    '''Main game logic.'''
+    """Main game logic."""
 
     def __init__(self):
-        '''Creating base data for game.'''
+        """Create base data for game."""
         self.field_size = 10
         self.monsters = {}  # key(x, y) -> Monster()
         self.switch = "on"
 
     def key(self, position):
-        '''Taking a key for monsters` map.'''
+        """Take a key for monsters` map."""
         return position[1] * self.field_size + position[0]
 
     def move(self, player, method, args):
-        '''Processing of move request from client.'''
+        """Process of move request from client."""
         response = []
         print("LOG: ", 'move', method, args)
 
@@ -169,7 +171,7 @@ class Game:
         return response
 
     def switcher(self, arg):
-        '''Processing of turning on|off the moving monsters setting.'''
+        """Process of turning on|off the moving monsters setting."""
         print("LOG: ", 'switcher', arg)
 
         if arg in ['on', 'off']:
@@ -181,7 +183,7 @@ class Game:
         return response
 
     def locale(self, player, locale):
-        '''Processing of changing the locale setting.'''
+        """Process of changing the locale setting."""
         response = []
         print("LOG: ", 'locale', locale)
 
@@ -191,7 +193,7 @@ class Game:
         return '\n'.join(response)
 
     def addmon(self, args):
-        '''Processing of addmon request from client.'''
+        """Process of addmon request from client."""
         response = []
         broken = False
         monster = {}
@@ -273,7 +275,7 @@ class Game:
         return response
 
     def attack(self, player, args):
-        '''Processing of attack request from client.'''
+        """Process of attack request from client."""
         response = []
         position = player.position()
         key = self.key(position)
@@ -305,7 +307,7 @@ users_info = dict()
 
 
 async def handler(reader, writer):
-    '''Main async-handler logic.'''
+    """Async logic of handler."""
     client = writer.get_extra_info("peername")
     print(f'New Client on {client}')
     my_id = None
@@ -412,6 +414,7 @@ async def handler(reader, writer):
 
 
 async def move_monsters():
+    """Async logic for moving monsters function."""
     while True:
         print("New Loop")
         print(f"switch {MUD_GAME.switch}")
@@ -459,7 +462,7 @@ async def move_monsters():
 
 
 async def main(port=1337):
-    '''Main async-server logic.'''
+    """Async logic of server."""
     print('Start working')
     server = await asyncio.start_server(handler, '0.0.0.0', port)
     print('activate server')
@@ -471,4 +474,5 @@ async def main(port=1337):
 
 
 def start(port=1337):
+    """Start the game."""
     asyncio.run(main(port))

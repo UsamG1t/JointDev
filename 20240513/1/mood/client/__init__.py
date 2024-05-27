@@ -1,3 +1,4 @@
+"""Main logic of client program."""
 import cmd
 import shlex
 
@@ -12,14 +13,17 @@ from ..common import *
 
 
 def msg_sendreciever(client, socket):
+    """Thread-based handler for recieving msges."""
     while response := socket.recv(1024).rstrip().decode():
         print(f"\n{response}\n{client.prompt}{readline.get_line_buffer()}",
               end="", flush=True)
 
 
 class MUDcmd(cmd.Cmd):
+    """Main cmd-based class."""
 
     def __init__(self, socket, stdin=None):
+        """Create client workspace."""
         self.field_size = 10
         self.socket = socket
         print("<<< Welcome to Python-MUD 0.1 >>>")
@@ -28,60 +32,53 @@ class MUDcmd(cmd.Cmd):
     prompt = ">> "
 
     def precmd(self, line):
+        """Pause commands for scripts."""
         time.sleep(1)
         return super().precmd(line)
 
     def do_EOF(self, args):
-        'Stops game by ^D combination'
+        """Stop game by ^D combination."""
         return 1
 
     def emptyline(self):
-        'auto-repeat of last command OFF'
+        """Auto-repeat of last command OFF."""
         return
 
     def do_documentation(self, args):
-        'Open documentation for user'
-
+        """Open documentation for user."""
         webbrowser.open("mood/_build/html/index.html")
 
     def do_register(self, args):
-        'Script registration'
-
+        """Script registration."""
         self.socket.sendall(f'register {args}\n'.encode())
 
     def do_movemonsters(self, args):
-        'swither of moving monsters setting'
-
+        """Swither of moving monsters setting."""
         self.socket.sendall(f'movemonsters {args}\n'.encode())
 
     def do_locale(self, locale):
-        'swither of locale setting'
-
+        """Swither of locale setting."""
         self.socket.sendall(f'locale {locale}\n'.encode())
 
     def do_up(self, args):
-        'one step UP on field'
-
+        """One step UP on field."""
         self.socket.sendall('move up\n'.encode())
 
     def do_down(self, args):
-        'one step DOWN on field'
-
+        """One step DOWN on field."""
         self.socket.sendall('move down\n'.encode())
 
     def do_left(self, args):
-        'one step LEFT on field'
-
+        """One step LEFT on field."""
         self.socket.sendall('move left\n'.encode())
 
     def do_right(self, args):
-        'one step RIGHT on field'
-
+        """One step RIGHT on field."""
         self.socket.sendall('move right\n'.encode())
 
     def do_addmon(self, args):
-        '''
-        Add monster on the position
+        """
+        Add monster on the position.
 
         first argument is a name of monster from [cowsay.list_cows() | 'jgsbat']
 
@@ -90,8 +87,7 @@ class MUDcmd(cmd.Cmd):
         1. coord <int[0...field_size)> <int[0...field_size)>
         2. hp <int[0...inf)>
         3. hello <string (with quotation for more than one word)>
-        '''
-
+        """
         args = shlex.split(args)
         broken = False
 
@@ -156,8 +152,7 @@ class MUDcmd(cmd.Cmd):
                 f'addmon {monster["name"]} hp {monster["hp"]} coord {m_x} {m_y} hello "{monster["message"]}"\n'.encode())
 
     def do_attack(self, args):
-        'Attack the monster in current position'
-
+        """Attack the monster in current position."""
         weapon = None
         args = shlex.split(args)
 
@@ -178,6 +173,7 @@ class MUDcmd(cmd.Cmd):
             self.socket.sendall(f'attack {args[0]} {weapon["damage"]}\n'.encode())
 
     def complete_attack(self, text, line, begidx, endidx):
+        """Complete args for attack command."""
         words = (line[:endidx] + ".").split()
         DICT = []
         match len(words):
@@ -189,4 +185,5 @@ class MUDcmd(cmd.Cmd):
         return [c for c in DICT if c.startswith(text)]
 
     def do_sayall(self, args):
+        """Send all users a message."""
         self.socket.sendall(f'sayall {args}\n'.encode())

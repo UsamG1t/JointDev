@@ -1,10 +1,13 @@
+"""Start client."""
 import threading
 import socket
 import sys
 
 from . import MUDcmd, msg_sendreciever
 
+
 def client():
+    """Start client's work."""
     if sys.argv[1] == '--file':
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect(("localhost", 1337))
@@ -29,6 +32,7 @@ def client():
                 cli.cmdloop()
             else:
                 print(response)
+
 
 if __name__ == "__main__":
     client()
