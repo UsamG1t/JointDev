@@ -31,20 +31,20 @@ def task_pot():
 def task_po():
     """Update translations."""
     return {
-            'actions': ['pybabel update --ignore-pot-creation-date -D MMUD_Locale -d po -l ru_RU.UTF-8 -i MMUD.pot'],
+            'actions': ['pybabel update --ignore-pot-creation-date -D MMUD_Locale -d mood/po -l ru_RU.UTF-8 -i MMUD.pot'],
             'file_dep': ['MMUD.pot'],
-            'targets': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
+            'targets': ['mood/po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
            }
 
 def task_i18n():
     """Compile translations."""
     return {
             'actions': [
-                (create_folder, [f'po/ru_RU.UTF-8/LC_MESSAGES']),
-                f'pybabel compile -D MMUD_Locale -l ru_RU.UTF-8 -i po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po -d po'
+                (create_folder, [f'mood/po/ru_RU.UTF-8/LC_MESSAGES']),
+                f'pybabel compile -D MMUD_Locale -l ru_RU.UTF-8 -i mood/po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po -d mood/po'
                        ],
-            'file_dep': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
-            'targets': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo'],
+            'file_dep': ['mood/po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
+            'targets': ['mood/po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.mo'],
            }
 
 def task_test():
