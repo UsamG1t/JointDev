@@ -1,6 +1,6 @@
 
 from glob import glob
-from doit.tools import create_folder
+from doit.tools import create_folder, clean_targets
 
 HTMLINDEX = "_build/html/index.html"
 
@@ -30,7 +30,7 @@ def task_pot():
 def task_po():
     """Update translations."""
     return {
-            'actions': ['pybabel update -D MMUD_Locale -d po -l ru_RU.UTF-8 -i MMUD.pot'],
+            'actions': ['pybabel update --ignore-pot-creation-date -D MMUD_Locale -d po -l ru_RU.UTF-8 -i MMUD.pot'],
             'file_dep': ['MMUD.pot'],
             'targets': ['po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
            }
