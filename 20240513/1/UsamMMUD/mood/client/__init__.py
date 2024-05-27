@@ -41,10 +41,10 @@ class MUDcmd(cmd.Cmd):
         'auto-repeat of last command OFF'
         return
 
-    def do_documentation(self):
+    def do_documentation(self, args):
         'Open documentation for user'
 
-        webbrowser.open("../../_build/html/index.html")
+        webbrowser.open("../_build/html/index.html")
 
     def do_register(self, args):
         'Script registration'
