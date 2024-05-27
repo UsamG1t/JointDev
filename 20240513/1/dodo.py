@@ -23,16 +23,16 @@ def task_erase():
 def task_pot():
     """Re-create .pot ."""
     return {
-            'actions': ['pybabel extract --keywords=ngettext:2,3 --keywords=gettext:2 mood -o MMUD.pot'],
+            'actions': ['pybabel extract --keywords=ngettext:2,3 --keywords=gettext:2 mood -o mood/MMUD.pot'],
             'file_dep': glob('mood/server/*.py'),
-            'targets': ['MMUD.pot'],
+            'targets': ['mood/MMUD.pot'],
            }
 
 def task_po():
     """Update translations."""
     return {
-            'actions': ['pybabel update --ignore-pot-creation-date -D MMUD_Locale -d mood/po -l ru_RU.UTF-8 -i MMUD.pot'],
-            'file_dep': ['MMUD.pot'],
+            'actions': ['pybabel update --ignore-pot-creation-date -D MMUD_Locale -d mood/po -l ru_RU.UTF-8 -i mood/MMUD.pot'],
+            'file_dep': ['mood/MMUD.pot'],
             'targets': ['mood/po/ru_RU.UTF-8/LC_MESSAGES/MMUD_Locale.po'],
            }
 
@@ -65,5 +65,5 @@ def task_wheel():
     """Build binary wheel."""
     return {
             'actions': ['python3.10 -m build -w'],
-            'task_dep': ['i18n'],
+            'task_dep': ['i18n', 'html'],
            }
