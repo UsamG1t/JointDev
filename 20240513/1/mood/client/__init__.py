@@ -45,7 +45,7 @@ class MUDcmd(cmd.Cmd):
 
     def do_documentation(self, args):
         """Open documentation for user."""
-        webbrowser.open("mood/_build/html/index.html")
+        webbrowser.open(f"{str(Path(__file__).parents[1])}/_build/html/index.html")
 
     def do_register(self, args):
         """Script registration."""
