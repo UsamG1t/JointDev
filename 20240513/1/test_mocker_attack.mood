@@ -1,0 +1,4 @@
+addmon default coord 0 0 hp 19 hello U
+attack default with spear
+attack default
+attack default with axe
