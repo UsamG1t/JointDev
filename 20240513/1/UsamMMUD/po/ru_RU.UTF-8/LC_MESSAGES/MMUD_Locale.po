@@ -20,43 +20,43 @@ msgstr ""
 "Generated-By: Babel 2.15.0\n"
 
 #: mood/server/__init__.py:40
-#~ msgid "Added monster {} with {} hp"
-#~ msgid_plural "Added monster {} with {} hp"
-#~ msgstr[0] "Добавлен монстр {}; здоровье монстра - {} очко"
-#~ msgstr[1] "Добавлен монстр {}; здоровье монстра - {} очка"
-#~ msgstr[2] "Добавлен монстр {}; здоровье монстра - {} очков"
+msgid "Added monster {} with {} hp"
+msgid_plural "Added monster {} with {} hp"
+msgstr[0] "Добавлен монстр {}; здоровье монстра - {} очко"
+msgstr[1] "Добавлен монстр {}; здоровье монстра - {} очка"
+msgstr[2] "Добавлен монстр {}; здоровье монстра - {} очков"
 
 #: mood/server/__init__.py:55
-#~ msgid "No {} here"
-#~ msgstr "Монстра {} здесь нет"
+msgid "No {} here"
+msgstr "Монстра {} здесь нет"
 
 #: mood/server/__init__.py:58
-#~ msgid "Attacked {}, damage {} hp"
-#~ msgid_plural "Attacked {}, damage {} hp"
-#~ msgstr[0] "Монстр {} атакован, снесено {} очко здоровья"
-#~ msgstr[1] "Монстр {} атакован, снесено {} очка здоровья"
-#~ msgstr[2] "Монстр {} атакован, снесено {} очков здоровья"
+msgid "Attacked {}, damage {} hp"
+msgid_plural "Attacked {}, damage {} hp"
+msgstr[0] "Монстр {} атакован, снесено {} очко здоровья"
+msgstr[1] "Монстр {} атакован, снесено {} очка здоровья"
+msgstr[2] "Монстр {} атакован, снесено {} очков здоровья"
 
 #: mood/server/__init__.py:64
-#~ msgid "{} now has {}"
-#~ msgid_plural "{} now has {}"
-#~ msgstr[0] "{} Теперь имеет {} очко здоровья"
-#~ msgstr[1] "{} Теперь имеет {} очка здоровья"
-#~ msgstr[2] "{} Теперь имеет {} очков здоровья"
+msgid "{} now has {}"
+msgid_plural "{} now has {}"
+msgstr[0] "{} Теперь имеет {} очко здоровья"
+msgstr[1] "{} Теперь имеет {} очка здоровья"
+msgstr[2] "{} Теперь имеет {} очков здоровья"
 
 #: mood/server/__init__.py:69
-#~ msgid "{} died"
-#~ msgstr "{} умер"
+msgid "{} died"
+msgstr "{} умер"
 
 #: mood/server/__init__.py:178
-#~ msgid "Set up locale: {}"
-#~ msgstr "Установлена локаль: {}"
+msgid "Set up locale: {}"
+msgstr "Установлена локаль: {}"
 
 #: mood/server/__init__.py:342
-#~ msgid "{} join the MUD"
-#~ msgstr "{} присоединился к игре"
+msgid "{} join the MUD"
+msgstr "{} присоединился к игре"
 
 #: mood/server/__init__.py:391
-#~ msgid "{} left the MUD"
-#~ msgstr "{} вышел из игры"
+msgid "{} left the MUD"
+msgstr "{} вышел из игры"
 

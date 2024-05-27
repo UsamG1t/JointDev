@@ -1,6 +1,6 @@
 
 from glob import glob
-from doit.tools import create_folder, clean_targets
+from doit.tools import create_folder
 
 HTMLINDEX = "_build/html/index.html"
 
