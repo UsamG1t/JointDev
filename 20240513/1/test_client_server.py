@@ -3,8 +3,8 @@ import socket
 import multiprocessing
 import time
 
-from server import start
-from client import MUDcmd
+from mood.server import start
+from mood.client import MUDcmd
 
 
 class TestRoot(unittest.TestCase):

@@ -50,7 +50,7 @@ def task_i18n():
 def task_test():
     """Update translations."""
     return {
-            'actions': ['python3.10 -m unittest test_client_server.py'],
+            'actions': ['python3.10 -m unittest test_client_server.py test_client.py'],
             'task_dep': ['i18n'],
            }
 
