@@ -366,7 +366,7 @@ async def handler(reader, writer):
                             if user_queue is not my_queue:
                                 answer = addmon_answer(users_info[user].locale, *response)
                                 await user_queue.put(f'{my_id} {answer}')
-                        
+
                         answer = addmon_answer(my_player.locale, *response)
                     case 'attack':
                         response = MUD_GAME.attack(my_player, shlex.join(args))
@@ -375,7 +375,7 @@ async def handler(reader, writer):
                             if user_queue is not my_queue:
                                 answer = attack_answer(users_info[user].locale, *response)
                                 await user_queue.put(f'{my_id} {answer}')
-                        
+
                         answer = attack_answer(my_player.locale, *response)
                     case 'sayall':
                         args = ' '.join(args)
@@ -453,7 +453,7 @@ async def move_monsters():
         await asyncio.sleep(30)
 
 
-async def main(port = 1337):
+async def main(port=1337):
     '''Main async-server logic.'''
     print('Start working')
     server = await asyncio.start_server(handler, '0.0.0.0', port)
@@ -464,5 +464,6 @@ async def main(port = 1337):
         print('Server Forever')
         await server.serve_forever()
 
-def start(port = 1337):
+
+def start(port=1337):
     asyncio.run(main(port))

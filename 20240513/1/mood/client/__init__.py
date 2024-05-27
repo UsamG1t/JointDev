@@ -4,8 +4,6 @@ import shlex
 import cowsay
 
 import readline
-import sys
-import socket
 import time
 
 import webbrowser

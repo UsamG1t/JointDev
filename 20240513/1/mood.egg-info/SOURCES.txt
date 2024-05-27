@@ -13,6 +13,8 @@ mood/__init__.py
 mood.egg-info/PKG-INFO
 mood.egg-info/SOURCES.txt
 mood.egg-info/dependency_links.txt
+mood.egg-info/entry_points.txt
+mood.egg-info/requires.txt
 mood.egg-info/top_level.txt
 mood/client/.flake8
 mood/client/__init__.py
