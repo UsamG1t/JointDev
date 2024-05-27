@@ -10,7 +10,7 @@ import time
 
 import webbrowser
 
-from common import *
+from ..common import *
 
 
 def msg_sendreciever(client, socket):

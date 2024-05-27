@@ -9,6 +9,7 @@ def task_html():
     return {
         'actions': ['sphinx-build -M html "Documentation/docs" "_build"'],
         'file_dep': ["Documentation/docs/index.rst", "Documentation/docs/server_documentation.rst", "mood/server/__init__.py"],
+        'task_dep': ['i18n'],
         'targets': [HTMLINDEX]
     }
 

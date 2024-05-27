@@ -3,9 +3,15 @@ import cowsay
 import shlex
 import asyncio
 import random
+import gettext
 from copy import copy
 
 from ..common import *
+
+LOCALES = {
+    ("ru_RU", "UTF-8"): gettext.translation("MMUD_Locale", "../po", ["ru_RU.UTF-8"]),
+    ("en_US", "UTF-8"): gettext.NullTranslations(),
+}
 
 
 def move_answer(x, y, name=None, message=None):

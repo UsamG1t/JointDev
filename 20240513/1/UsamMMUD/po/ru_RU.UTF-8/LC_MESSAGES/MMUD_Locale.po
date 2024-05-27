@@ -19,44 +19,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: mood/server/__init__.py:40
+#: mood/server/__init__.py:46
 msgid "Added monster {} with {} hp"
 msgid_plural "Added monster {} with {} hp"
 msgstr[0] "Добавлен монстр {}; здоровье монстра - {} очко"
 msgstr[1] "Добавлен монстр {}; здоровье монстра - {} очка"
 msgstr[2] "Добавлен монстр {}; здоровье монстра - {} очков"
 
-#: mood/server/__init__.py:55
+#: mood/server/__init__.py:61
 msgid "No {} here"
 msgstr "Монстра {} здесь нет"
 
-#: mood/server/__init__.py:58
+#: mood/server/__init__.py:64
 msgid "Attacked {}, damage {} hp"
 msgid_plural "Attacked {}, damage {} hp"
 msgstr[0] "Монстр {} атакован, снесено {} очко здоровья"
 msgstr[1] "Монстр {} атакован, снесено {} очка здоровья"
 msgstr[2] "Монстр {} атакован, снесено {} очков здоровья"
 
-#: mood/server/__init__.py:64
+#: mood/server/__init__.py:70
 msgid "{} now has {}"
 msgid_plural "{} now has {}"
 msgstr[0] "{} Теперь имеет {} очко здоровья"
 msgstr[1] "{} Теперь имеет {} очка здоровья"
 msgstr[2] "{} Теперь имеет {} очков здоровья"
 
-#: mood/server/__init__.py:69
+#: mood/server/__init__.py:75
 msgid "{} died"
 msgstr "{} умер"
 
-#: mood/server/__init__.py:178
+#: mood/server/__init__.py:184
 msgid "Set up locale: {}"
 msgstr "Установлена локаль: {}"
 
-#: mood/server/__init__.py:342
+#: mood/server/__init__.py:348
 msgid "{} join the MUD"
 msgstr "{} присоединился к игре"
 
-#: mood/server/__init__.py:391
+#: mood/server/__init__.py:397
 msgid "{} left the MUD"
 msgstr "{} вышел из игры"
 
