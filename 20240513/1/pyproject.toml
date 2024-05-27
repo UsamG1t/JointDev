@@ -10,3 +10,8 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.package-dir]
 mood = "mood"
 
+
+[project.scripts]
+client = "mood.client.__main__:client"
+server = "mood.server.__main__:start"
+

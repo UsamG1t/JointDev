@@ -1,5 +1,6 @@
 MANIFEST.in
 Pipfile
+README.md
 dodo.py
 pyproject.toml
 test_client_server.py
