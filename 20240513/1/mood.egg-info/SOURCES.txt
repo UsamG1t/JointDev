@@ -9,6 +9,7 @@ Documentation/make.bat
 Documentation/docs/conf.py
 Documentation/docs/index.rst
 Documentation/docs/server_documentation.rst
+mood/MMUD.pot
 mood/__init__.py
 mood.egg-info/PKG-INFO
 mood.egg-info/SOURCES.txt
