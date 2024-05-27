@@ -2,8 +2,8 @@
 *.mo
 *.pot
 *__pycache__*
-*_build*
+*build*
 *.doit.db
 *egg-info*
-*dist/*
+*dist*
 *README.md*
