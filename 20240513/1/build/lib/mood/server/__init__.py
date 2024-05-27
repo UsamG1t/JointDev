@@ -9,7 +9,7 @@ from copy import copy
 from ..common import *
 
 LOCALES = {
-    ("ru_RU", "UTF-8"): gettext.translation("MMUD_Locale", "po", ["ru_RU.UTF-8"]),
+    ("ru_RU", "UTF-8"): gettext.translation("MMUD_Locale", "mood/po", ["ru_RU.UTF-8"]),
     ("en_US", "UTF-8"): gettext.NullTranslations(),
 }
 

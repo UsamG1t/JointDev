@@ -42,7 +42,7 @@ class MUDcmd(cmd.Cmd):
     def do_documentation(self, args):
         'Open documentation for user'
 
-        webbrowser.open("_build/html/index.html")
+        webbrowser.open("mood/_build/html/index.html")
 
     def do_register(self, args):
         'Script registration'
