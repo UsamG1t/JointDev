@@ -1,6 +1,5 @@
 graft mood
 graft Documentation
-recursive-include po *.po
 include pyproject.toml
 include Pipfile
 include dodo.py
